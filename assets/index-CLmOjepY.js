@@ -78,6 +78,11 @@ Please change the parent <Route path="${D}"> to <Route path="${D==="/"?"*":`${D}
     justify-content: center;
     align-items: center;
     z-index: 10;
+
+    @media screen and (max-width: 768px)
+    {
+        margin-bottom: 0;
+    }
 `,_a=et(Hg)`
     color: #f5f5dc;
     font-weight: 400;
@@ -1550,30 +1555,47 @@ PERFORMANCE OF THIS SOFTWARE.
 	min-height: 90vh;
 	gap: 6rem;
 
-	@media (max-width: 768px) {
+	@media (max-width: 768px) 
+    {
 		flex-direction: column;
 		text-align: center;
-		gap: 2rem;
+        gap: 0;
+        padding-top: 1rem;
   }
 `,PD=et.div`
 	max-width: 542px;
 	text-align: left;
 `,KD=et.div`
-	img {
+	img 
+    {
 		width: 400px;
 		height: 400px;
 		object-fit: cover;
 		border-radius: 12px;
 	}
 	
-	@media (max-width: 768px) {
-		margin-top: 2rem;
+	@media (max-width: 768px) 
+    {
+		margin-top: 0rem;
+
+        img 
+        {
+            width: 200px;
+            height: 200px;
+        }
 	}
 `,ZD=et.h1`
 	font-size: 5rem;
 	font-weight: 900;
 	line-height: 1.2;
 	color: #f5f5dc;
+
+    @media (max-width: 768px) 
+    {
+        font-size: 3rem;
+        margin-top: 0;
+        padding: 0;
+    }
 `,QD=et.p`
 	font-size: 1.2rem;
 	font-weight: 400;
