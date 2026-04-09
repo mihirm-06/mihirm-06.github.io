@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation'
 import { BsGithub, BsLinkedin } from "react-icons/bs";
+import { FaFilePdf } from "react-icons/fa6";
 import Amogus from '../assets/amogus.gif';
 
 const Container = styled.div`
@@ -129,6 +130,9 @@ export const Home = () => {
 					<ContactRow>
 						<ContactLink href="mailto:mihir.mankikar@gmail.com">send me an email →</ContactLink>
 						<SocialIcons>
+							<motion.div whileHover={{ y: -4}} transition={{ type: 'spring', stiffness: 300 }}>
+								<a href="https://linkedin.com/in/mihirm06" target="_blank" rel="noreferrer"><FaFilePdf /></a>
+							</motion.div>
 							<motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300 }}>
 								<a href="https://github.com/mihirm-06" target="_blank" rel="noreferrer"><BsGithub /></a>
 							</motion.div>

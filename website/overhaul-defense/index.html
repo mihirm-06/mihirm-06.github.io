@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mihir Mankikar portfolio site." />
+    <title>Mihir Mankikar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="top-anchor" aria-hidden="true"></div>
+    <header class="navbar">
+      <nav aria-label="Primary">
+        <a href="#top-anchor">Home</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="home" id="home">
+        <div class="home-head reveal">
+          <h1>Mihir Mankikar</h1>
+          <p><span id="typed"></span></p>
+          <div class="home-icons" aria-label="Contact links">
+            <!-- shoutout ChatGPT for these SVGs -->    
+            <a href="https://linkedin.com/in/mihirm06" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 8.6h3.2V19H4.6zM6.2 3.8a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8Zm3.6 4.8H13v1.4h.1c.4-.8 1.4-1.7 3-1.7 3.2 0 3.8 2.1 3.8 4.9V19h-3.2v-5c0-1.2 0-2.8-1.7-2.8-1.7 0-2 1.3-2 2.7V19H9.8z" fill="currentColor"/></svg>
+            </a>
+            <a href="https://github.com/mihirm-06" target="_blank" rel="noreferrer" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.3a9.8 9.8 0 0 0-3.1 19.1c.5.1.7-.2.7-.5v-2c-2.9.6-3.6-1.2-3.6-1.2-.4-1.1-1-1.4-1-1.4-.8-.5.1-.5.1-.5.9.1 1.4 1 1.4 1 .8 1.4 2.1 1 2.7.8.1-.6.3-1 .6-1.3-2.3-.3-4.6-1.2-4.6-5.2 0-1.1.4-2.1 1-2.9-.1-.2-.4-1.2.1-2.6 0 0 .8-.3 2.9 1.1a9.8 9.8 0 0 1 5.2 0c2-1.4 2.9-1.1 2.9-1.1.5 1.4.2 2.4.1 2.6.7.8 1 1.8 1 2.9 0 4-2.3 4.9-4.6 5.2.4.3.7 1 .7 1.9v2.9c0 .3.2.6.7.5A9.8 9.8 0 0 0 12 2.3Z" fill="currentColor"/></svg>
+            </a>
+            <a href="mailto:mihir.mankikar@gmail.com" aria-label="Email">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.75h18v10.5H3z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.2 7.6 12 13.4l7.8-5.8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </a>
+            <a href="./resume.pdf" aria-label="Resume">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.8h8.7L19 8v12.2H6z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14.7 3.8V8H19" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 11h7.4M8.8 14h7.4M8.8 17h5.1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <section class="section-block reveal delay-1">
+          <div class="section-title-row">
+            <h2>RECENT PROJECTS</h2>
+          </div>
+          <div class="card-grid" id="projects-grid"></div>
+        </section>
+
+        <section class="section-block reveal delay-2">
+          <div class="section-title-row">
+            <h2>EXTRACURRICULARS</h2>
+          </div>
+          <div class="card-grid" id="extracurriculars-grid"></div>
+        </section>
+      </section>
+
+      <section class="about" id="about">
+        <div class="section-title-row reveal">
+          <h2>EXPERIENCE</h2>
+        </div>
+
+        <article class="timeline-item reveal delay-1">
+            <div class="timeline-content">
+              <p class="date-range">summer 2026</p>
+              <h3>AI/ML Automation Intern (Incoming)</h3>
+              <p class="company">Texas Instruments</p>
+            </div>
+          </article>
+
+        <div class="timeline">
+          <article class="timeline-item reveal delay-2">
+            <div class="timeline-content">
+              <p class="date-range">jan 2026 — present</p>
+              <h3>Undergraduate Researcher</h3>
+              <p class="company">Texas A&M University</p>
+              <ul>
+                <li>Collaborating with the U.S. Space Force to develop an ML network intrusion dashboard for defensive cyber operations.</li>
+                <li>Implementing real-time detection of DDoS, spoofing, and jamming threats.</li>
+                <li>Designing a condition monitoring system with operator alerts to visualize network health and streamline incident response.</li>
+              </ul>
+              <div class="tags">
+                <span>Python</span><span>LightGBM</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="timeline-item reveal delay-3">
+            <div class="timeline-content">
+              <p class="date-range">may 2025 — present </p>
+              <h3>Undergraduate Researcher</h3>
+              <p class="company">Texas A&M University</p>
+              <ul>
+                <li>Developed ARIMA/SARIMAX forecasting frameworks for U.S. calf prices using CPI-deflation and walk-forward validation to ensure model reliability.</li>
+                <li>Engineered high-dimensional feature sets using the Boruta algorithm and rolling statistics to optimize model interpretability and performance.</li>
+                <li>Evaluated diverse ML architectures, including LightGBM and SVR, using Optuna for automated, high-precision hyperparameter optimization.</li>
+                <li>Deployed LSTM-based deep learning pipelines to capture non-linear price dynamics and provide actionable decision support for cattle operations.</li>
+              </ul>
+              <div class="tags">
+                <span>python</span><span>scikit-learn</span><span>statsmodels</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <a class="timeline-download" href="./resume.pdf" download>Download Resume</a>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
