@@ -1,14 +1,21 @@
 export interface Role {
+  // which Home section the entry shows in
+  section: 'experience' | 'research';
   role: string;
   org: string;
   dates: string;
   bullets: string[];
   tags: string[];
+  // optional links under the tags, e.g. a poster or paper. Put your own PDFs in
+  // public/research/ and link them as '/research/file.pdf'; link published papers
+  // by their DOI or arXiv URL instead.
+  links?: { label: string; href: string }[];
 }
 
-// newest first
+// newest first within each section
 export const experience: Role[] = [
   {
+    section: 'experience',
     role: 'AI/ML Automation Intern',
     org: 'Texas Instruments',
     dates: 'June 2026 – August 2026',
@@ -20,6 +27,18 @@ export const experience: Role[] = [
     tags: ['Python', 'SQL', 'MCP'],
   },
   {
+    section: 'experience',
+    role: 'Avionics & Control Systems',
+    org: 'Texas A&M Rocket Engine Design',
+    dates: 'January 2026 – Present',
+    bullets: [
+      'Designed a binary protocol linking the Python ground GUI to Teensy flight hardware, with an automatic abort system.',
+      'Writing firmware for real-time engine throttling and gimbal control.',
+    ],
+    tags: ['C++', 'Python', 'Teensy 4.1'],
+  },
+  {
+    section: 'research',
     role: 'Intrusion Detection Researcher',
     org: 'Texas A&M University',
     dates: 'January 2026 – May 2026',
@@ -30,16 +49,7 @@ export const experience: Role[] = [
     tags: ['Python', 'PyTorch'],
   },
   {
-    role: 'Avionics & Controls',
-    org: 'Texas A&M Rocket Engine Design',
-    dates: 'January 2026 – Present',
-    bullets: [
-      'Designed a binary protocol linking the Python ground GUI to Teensy flight hardware, with an automatic abort system.',
-      'Writing firmware for real-time engine throttling and gimbal control.',
-    ],
-    tags: ['Python', 'C++', 'Teensy 4.1'],
-  },
-  {
+    section: 'research',
     role: 'Price Forecasting Researcher',
     org: 'Texas A&M University',
     dates: 'May 2025 – May 2026',
@@ -48,5 +58,6 @@ export const experience: Role[] = [
       'Used walk-forward validation and automated tuning so results hold up on unseen data.',
     ],
     tags: ['Python', 'scikit-learn', 'statsmodels'],
+    links: [{ label: 'Poster', href: '/research/cow-calf_poster.pdf' }]
   },
 ];

@@ -2,11 +2,13 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import FeatureCard from '../components/FeatureCard.astro';
-import Tags from '../components/Tags.astro';
+import RoleList from '../components/RoleList.astro';
 import Typed from '../components/Typed.astro';
 import { site } from '../data/site';
 import { experience } from '../data/experience';
 
+const jobs = experience.filter((r) => r.section === 'experience');
+const research = experience.filter((r) => r.section === 'research');
 const featured = (await getCollection('projects', ({ data }) => data.featured)).sort((a, b) => b.data.order - a.data.order);
 ---
 
@@ -42,22 +44,15 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
 
   <section class="sec" id="experience">
     <div class="sec-head"><h2>Experience</h2><a class="sec-link" href={site.resume} download>Download résumé ↓</a></div>
-    <div class="split">
-      {experience.map((job) => (
-        <article class="split-item">
-          <div class="split-head">
-            <h3 class="role">{job.role}</h3>
-            <p class="org">{job.org}</p>
-            <p class="date">{job.dates}</p>
-          </div>
-          <div class="split-body">
-            <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
-            <Tags tags={job.tags} />
-          </div>
-        </article>
-      ))}
-    </div>
+    <RoleList roles={jobs} />
   </section>
+
+  {research.length > 0 && (
+    <section class="sec" id="research">
+      <div class="sec-head"><h2>Research</h2></div>
+      <RoleList roles={research} />
+    </section>
+  )}
 </Base>
 
 <style>
@@ -81,16 +76,7 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
 
   .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 
-  .split { display: grid; }
-  .split-item { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); gap: 0.8rem 3rem; padding: 1.2rem 0; }
-  .split-item:first-child { padding-top: 0.6rem; }
-  .role { margin: 0; font-size: 1.08rem; font-weight: 700; text-wrap: balance; }
-  .org { margin: 0.25rem 0 0; opacity: 0.85; font-size: 0.95rem; }
-  .split-head .date { margin-top: 0.6rem; }
-  .split-body :global(.tags) { margin-top: 0.7rem; }
-
   @media (max-width: 760px) {
     .feature-grid { grid-template-columns: 1fr; }
-    .split-item { grid-template-columns: 1fr; gap: 0.8rem; }
   }
 </style>

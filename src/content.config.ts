@@ -4,7 +4,8 @@ import { z } from 'astro/zod';
 
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
-  schema: z.object({
+  // strictObject: a misspelled field name stops the build instead of being ignored
+  schema: z.strictObject({
     title: z.string(),
     // one line shown on the card
     summary: z.string(),

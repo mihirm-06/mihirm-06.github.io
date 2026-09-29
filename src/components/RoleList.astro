@@ -1,0 +1,61 @@
+---
+// The split layout used by the Experience and Research sections on Home:
+// role, organization, and dates on the left with bullets on the right; below them,
+// links on the left and tags on the right, on the same line.
+import type { Role } from '../data/experience';
+import Tags from './Tags.astro';
+
+interface Props { roles: Role[] }
+const { roles } = Astro.props;
+---
+
+<div class="split">
+  {roles.map((job) => (
+    <article class="split-item">
+      <div class="split-head">
+        <h3 class="role">{job.role}</h3>
+        <p class="org">{job.org}</p>
+        <p class="date">{job.dates}</p>
+      </div>
+      <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
+      {job.links && job.links.length > 0 && (
+        <p class="role-links">
+          {job.links.map((link) => (
+            <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
+          ))}
+        </p>
+      )}
+      <div class="role-tags"><Tags tags={job.tags} /></div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .split { display: grid; }
+  .split-item {
+    display: grid;
+    grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+    grid-template-areas:
+      "head bullets"
+      "links tags";
+    column-gap: 3rem;
+    padding: 1.2rem 0;
+  }
+  .split-item:first-child { padding-top: 0.6rem; }
+  .split-head { grid-area: head; }
+  .bullets { grid-area: bullets; }
+  .role-links { grid-area: links; margin: 0.7rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-self: baseline; }
+  .role-tags { grid-area: tags; margin-top: 0.7rem; align-self: baseline; }
+  .role { margin: 0; font-size: 1.08rem; font-weight: 700; text-wrap: balance; }
+  .org { margin: 0.25rem 0 0; opacity: 0.85; font-size: 0.95rem; }
+  .split-head .date { margin-top: 0.6rem; }
+
+  @media (max-width: 760px) {
+    .split-item {
+      grid-template-columns: 1fr;
+      grid-template-areas: "head" "bullets" "tags" "links";
+      row-gap: 0.8rem;
+    }
+    .role-links, .role-tags { margin-top: 0; }
+  }
+</style>
