@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Cover from './Cover.astro';
+import Tags from './Tags.astro';
+
+interface Props { project: CollectionEntry<'projects'> }
+const { id, data } = Astro.props.project;
+---
+
+<a class="feature" href={`/projects/${id}`}>
+  <div class="inner">
+    {data.cover && <div class="viz"><Cover name={data.cover} /></div>}
+    <div class="body">
+      <p class="kicker">{data.kicker}{data.status === 'in progress' && ' · In progress'}</p>
+      <h3>{data.title}</h3>
+      <p class="summary">{data.summary}</p>
+      <div class="foot-row">
+        <Tags tags={data.tags} />
+        <span class="read">Read →</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+<style>
+  .feature {
+    display: block;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    transition: border-color 160ms ease;
+  }
+  .feature:hover { border-color: var(--accent); }
+  .inner { display: flex; flex-direction: column; height: 100%; }
+  .viz { border-bottom: var(--rule); }
+  .body { flex: 1; padding: 1.35rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  h3 { margin: 0; font-size: 1.2rem; font-weight: 700; text-wrap: balance; }
+  .summary { margin: 0; color: var(--muted); line-height: 1.6; }
+  .foot-row { margin-top: auto; padding-top: 0.6rem; display: flex; justify-content: space-between; align-items: last baseline; gap: 1rem; }
+  .read { font: 400 0.7rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
+  .feature:hover .read { color: var(--accent); }
+
+</style>

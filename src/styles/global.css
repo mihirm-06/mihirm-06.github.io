@@ -1,0 +1,140 @@
+/* Sage dark. Each accent has one job:
+   green  (--accent)   anything clickable
+   blue   (--sec)      dates, labels, bullet markers, chart highlights
+   (exception: the hero typing cursor is green)
+   orange (--accent-2) tags and the Now line */
+:root {
+  color-scheme: dark;
+  --bg: #19211c;
+  --surface: #212b25;
+  --text: #e3ebdf;
+  --muted: #a3b4a6;
+  --line: rgba(227, 235, 223, 0.18);
+  --line-soft: rgba(227, 235, 223, 0.09);
+  --ink-soft: rgba(227, 235, 223, 0.3);
+  --accent: #86cfa2;
+  --sec: #86aee6;
+  --accent-2: #f0895c;
+  --rule: 2px solid rgba(227, 235, 223, 0.16);
+  --hatch: rgba(227, 235, 223, 0.05);
+
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --content: 1180px;
+  --gutter: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background-color: var(--bg);
+  background-image: repeating-linear-gradient(135deg, var(--hatch) 0 1px, transparent 1px 14px);
+}
+
+img, svg { max-width: 100%; }
+
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.wrap { width: 100%; max-width: var(--content); margin: 0 auto; padding-inline: var(--gutter); }
+
+main.wrap { flex: 1; display: grid; align-content: start; gap: 4.5rem; padding-block: 5rem; }
+
+/* ---------- nav ---------- */
+.nav { border-bottom: var(--rule); }
+.nav .wrap { display: flex; gap: 2rem; min-height: 60px; align-items: center; }
+.nav a {
+  font: 400 0.74rem/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid transparent;
+}
+.nav a:hover, .nav a[aria-current="page"] { border-bottom-color: var(--accent); }
+.nav a[aria-current="page"] { color: var(--accent); }
+
+/* ---------- shared pieces ---------- */
+.sec { display: grid; gap: 1.1rem; }
+.sec-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: var(--rule);
+  padding-bottom: 0.7rem;
+}
+.sec-head h2, .sec-head h1 { margin: 0; font-weight: 700; font-size: 1.35rem; }
+.sec-link {
+  font: 400 0.72rem/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sec-link:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+
+.kicker, .date {
+  margin: 0;
+  font: 400 0.7rem/1.4 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sec);
+  font-variant-numeric: tabular-nums;
+}
+
+.tags {
+  /* every tag gets a leading "·"; the list is shifted left and clipped so the dot
+     at the start of each line is hidden, even when tags wrap */
+  overflow: hidden;
+  font: 400 0.72rem/1.4 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.tags-list { display: flex; flex-wrap: wrap; row-gap: 0.25rem; margin-left: -1.3rem; }
+.tags-list span { white-space: nowrap; }
+.tags-list span::before { content: "·"; display: inline-block; width: 1.3rem; text-align: center; opacity: 0.6; }
+
+.bullets { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.95rem; line-height: 1.6; max-width: 72ch; }
+.bullets li + li { margin-top: 0.25rem; }
+.bullets li::marker { color: var(--sec); }
+
+.foot { border-top: var(--rule); }
+.foot .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-block: 1.6rem;
+  font: 400 0.7rem/1.5 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.foot a { color: var(--accent); text-decoration: none; }
+.foot a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.foot-links a + a::before { content: "·"; color: var(--muted); margin-right: 0.4rem; display: inline-block; }
+
+@media (max-width: 760px) {
+  :root { --gutter: 16px; }
+  main.wrap { padding-block: 3rem; gap: 3.5rem; }
+  .nav .wrap { gap: 1.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => b.data.order - a.data.order);
+---
+
+<Base title="Projects" description="Projects by Mihir Mankikar: tracking systems, ML, games, and more.">
+  <section class="sec">
+    <div class="sec-head"><h1>Projects</h1></div>
+    <div class="grid">{projects.map((project) => <FeatureCard project={project} />)}</div>
+  </section>
+</Base>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>

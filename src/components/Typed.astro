@@ -1,0 +1,52 @@
+---
+// Types out each phrase, deletes it, moves to the next. Shows the first phrase statically
+// without JavaScript or with reduced motion. The cursor stays solid while typing or
+// deleting and blinks while paused.
+interface Props { phrases: string[] }
+const { phrases } = Astro.props;
+---
+
+<p class="tagline">
+  <span class="typed" data-phrases={JSON.stringify(phrases)}>{phrases[0]}</span><span class="cursor" aria-hidden="true"></span>
+</p>
+
+<script>
+  const el = document.querySelector<HTMLElement>('.typed');
+  const cursor = document.querySelector<HTMLElement>('.tagline .cursor');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (el && cursor && !reduce) {
+    const phrases: string[] = JSON.parse(el.dataset.phrases ?? '[]');
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const solid = (on: boolean) => cursor.classList.toggle('solid', on);
+    el.textContent = '';
+    (async () => {
+      for (let i = 0; ; i = (i + 1) % phrases.length) {
+        const phrase = phrases[i];
+        solid(true);
+        for (let n = 1; n <= phrase.length; n++) { el.textContent = phrase.slice(0, n); await sleep(75); }
+        solid(false);
+        await sleep(1400);
+        solid(true);
+        for (let n = phrase.length - 1; n >= 0; n--) { el.textContent = phrase.slice(0, n); await sleep(45); }
+        solid(false);
+        await sleep(400);
+      }
+    })();
+  }
+</script>
+
+<style>
+  .tagline { margin: 0.9rem 0 0; color: var(--muted); font-size: 1rem; min-height: 1.5em; }
+  /* a drawn bar instead of a "|" character, so its size doesn't depend on the font */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.15em;
+    margin-left: 2px;
+    vertical-align: -0.2em;
+    background: var(--accent);
+    animation: blink 1s steps(1) infinite;
+  }
+  .cursor.solid { animation: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>

@@ -109,9 +109,19 @@
           </article>
         </div>
 
-        <a class="timeline-download" href="./assets/resume.pdf" download>Download Resume</a>
+        <a class="timeline-download" href="./assets/Mihir_Mankikar_resume.pdf" download>Download Resume</a>
       </section>
     </main>
+
+    <div class="detail-modal" id="detail-modal" hidden aria-hidden="true">
+      <div class="detail-modal__scrim" data-modal-close></div>
+      <div class="detail-modal__panel" role="dialog" aria-modal="true">
+        <button class="detail-modal__close" type="button" aria-label="Close detail view" data-modal-close>
+          ×
+        </button>
+        <div class="detail-modal__content" id="detail-modal-content"></div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script src="./script.js"></script>

@@ -1,0 +1,55 @@
+---
+// A project's write-up page: just the Markdown body of its file in src/content/projects.
+// The card fields (summary, kicker, tags, cover) only appear on the cards.
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Base title={project.data.title} description={project.data.summary}>
+  <article class="project">
+    <a class="sec-link back" href="/projects">← All projects</a>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .project { display: grid; gap: 2.2rem; }
+  .back { justify-self: start; }
+
+  .prose { max-width: 70ch; font-size: 1.02rem; line-height: 1.75; }
+  .prose > :global(:first-child) { margin-top: 0; }
+  .prose :global(h1) { margin: 0 0 1rem; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; line-height: 1; text-wrap: balance; }
+  .prose :global(h2) { margin: 2.2rem 0 0.6rem; font-size: 1.25rem; font-weight: 700; }
+  .prose :global(h3) { margin: 1.8rem 0 0.5rem; font-size: 1.08rem; font-weight: 700; }
+  .prose :global(p) { margin: 0 0 1rem; }
+  .prose :global(p), .prose :global(li) { color: var(--muted); }
+  .prose :global(strong) { color: var(--text); font-weight: 700; }
+  .prose :global(ul), .prose :global(ol) { margin: 0 0 1rem; padding-left: 1.2rem; }
+  .prose :global(li + li) { margin-top: 0.35rem; }
+  .prose :global(li::marker) { color: var(--sec); }
+  .prose :global(a) { color: var(--accent); text-underline-offset: 0.2em; }
+  .prose :global(code) { font-family: var(--mono); font-size: 0.9em; color: var(--text); }
+  .prose :global(pre) { overflow-x: auto; padding: 1rem; background: var(--surface); border: 1px solid var(--line); font-size: 0.88rem; line-height: 1.6; }
+  .prose :global(blockquote) { margin: 0 0 1rem; padding-left: 1rem; border-left: 2px solid var(--sec); }
+  .prose :global(hr) { border: 0; border-top: var(--rule); margin: 2rem 0; }
+
+  /* images, videos, and embeds fill the text column */
+  .prose :global(img), .prose :global(video), .prose :global(iframe) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 1.6rem 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .prose :global(iframe) { aspect-ratio: 16 / 9; }
+  .prose :global(p:has(> img:only-child)) { margin: 0; }
+</style>
