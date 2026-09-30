@@ -170,8 +170,8 @@ const images = await Promise.all(
     transition: opacity 180ms ease, transform 180ms ease;
   }
   .open:hover figcaption, .open:focus-visible figcaption { opacity: 1; transform: none; }
-  /* phones and tablets have no hover, so captions are always shown */
-  @media (hover: none) { figcaption { opacity: 1; transform: none; } }
+  /* phones and tablets have no hover: keep the grid clean and show captions only in the viewer */
+  @media (hover: none) { figcaption { display: none; } }
 
   .empty { margin: 0; color: var(--muted); }
 
