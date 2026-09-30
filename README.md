@@ -9,7 +9,8 @@ This repository contains the personal website of Mihir Mankikar. The website use
 | `src/content/projects/` | One Markdown file for each project |
 | `src/data/experience.ts` | The entries of the Experience and Research sections |
 | `src/data/gallery.ts` | The list of photos on the Gallery page |
-| `src/data/site.ts` | Your name, the typed phrases, the "Now" line, and your links |
+| `src/data/education.ts` | The Education section |
+| `src/data/site.ts` | Your name, the typed phrases, and your links |
 | `src/assets/covers/` | The images on the project cards |
 | `src/assets/gallery/` | The photos for the Gallery page |
 | `public/assets/` | The résumé PDF and the site icon |
@@ -101,13 +102,13 @@ A project with no `order` shows last. Do not give two projects the same number.
 
 ### 3.6 Set a project as featured
 
-Featured projects show on the Home page and on the Projects page.
+Featured projects show in the "Selected projects" section of the Home page. They also show on the Projects page. On the Home page, the cards do not show the card image.
 
 1. Open the file of the project.
 2. Add the line `featured: true` to the top part.
 3. To remove the project from the Home page, delete the line. You can also set it to `featured: false`.
 
-The Home page shows two cards in each row. Use an even number of featured projects, for example two or four. Use projects that have a card image.
+The Home page shows two cards in each row. Use an even number of featured projects, for example two or four.
 
 ### 3.7 Add a card image
 
@@ -142,9 +143,15 @@ To add a video file:
 
 To add a YouTube video, copy the embed code from YouTube. Then put the `<iframe>` code on a separate line.
 
-## 4. Experience and Research
+## 4. Education, Experience, and Research
 
-The Home page has two sections: Experience and Research. The data for both sections is in `src/data/experience.ts`.
+The Home page shows these sections in this order: Education, Experience, Research, and Selected projects.
+
+The data for Education is in `src/data/education.ts`. The data for Experience and Research is in `src/data/experience.ts`.
+
+### 4.0 Education
+
+Education entries use the same fields as Experience and Research (section 4.1). Set `section` to `'education'`. Set `tags` to an empty list (`[]`). Keep the bullets short, for example `'GPA: 3.9'`.
 
 ### 4.1 Parts of an entry
 
@@ -174,6 +181,7 @@ The Home page has two sections: Experience and Research. The data for both secti
 | `bullets` | Yes | The list on the right. Use two or three bullets. |
 | `tags` | Yes | The orange tags below the bullets. |
 | `links` | No | Green links below the tags, for example a poster or a paper. |
+| `paper` | No | A paper for a research entry. See section 4.4. |
 
 If no entry has `section: 'research'`, the Research section does not show.
 
@@ -222,6 +230,35 @@ This has three advantages:
 
 Before you publish a poster or a paper about the Space Force work, get approval from your advisor.
 
+### 4.4 Show the status of a paper
+
+Add a `paper` field to a research entry:
+
+```ts
+paper: {
+  status: 'Paper under review',
+  href: 'https://doi.org/10.xxxx/xxxxx',
+},
+```
+
+| Field | Necessary | What it does |
+|---|---|---|
+| `status` | Yes | A gray line below the dates. |
+| `href` | No | Adds a green "Paper ↗" link. Use the DOI link or the arXiv link. |
+
+Change `status` when the paper moves to the next stage:
+
+| Stage | `status` |
+|---|---|
+| You write the paper | `'Paper in progress'` |
+| A journal reviews the paper | `'Paper under review'` |
+| A journal accepts the paper | `'Accepted, Journal Name 2027'` |
+| The journal publishes the paper | `'Published, Journal Name 2027'`. Also add `href`. |
+
+Do not write the name of the journal before it accepts the paper.
+
+To link an abstract, put the PDF in `public/research/`. Then add it to `links` (section 4.3), for example `{ label: 'Abstract', href: '/research/abstract.pdf' }`.
+
 ## 5. Gallery
 
 The Gallery page shows the photos in `src/data/gallery.ts`. The page shows the photos in the order of the list.
@@ -267,7 +304,6 @@ All of this text is in `src/data/site.ts`.
 | Field | What it does |
 |---|---|
 | `taglines` | The phrases that the Home page types below your name. |
-| `now` | The orange "Now" line. Set it to `null` to remove the line. |
 | `resume` | The path of the résumé file. |
 | `links` | Your LinkedIn, GitHub, and email address. |
 | `description` | The text that search engines and link previews show. |
@@ -287,7 +323,7 @@ Each accent color has one function. Keep these functions when you change the web
 |---|---|
 | Green | Items that you can click. The typing cursor also uses green. |
 | Blue | Dates, labels, bullet markers, and chart highlights. |
-| Orange | Tags and the "Now" line. |
+| Orange | Tags. |
 
 The color values are at the top of `src/styles/global.css`.
 

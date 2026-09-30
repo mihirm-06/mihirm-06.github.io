@@ -1,6 +1,6 @@
 export interface Role {
   // which Home section the entry shows in
-  section: 'experience' | 'research';
+  section: 'education' | 'experience' | 'research';
   role: string;
   org: string;
   dates: string;
@@ -10,6 +10,11 @@ export interface Role {
   // public/research/ and link them as '/research/file.pdf'; link published papers
   // by their DOI or arXiv URL instead.
   links?: { label: string; href: string }[];
+  // optional paper for a research entry. `status` shows under the dates, e.g.
+  // 'Paper in progress', 'Paper under review', 'Published, Journal Name 2027'.
+  // `href` (the DOI or arXiv link, once published) adds a "Paper" link.
+  // To link an abstract PDF, add it to `links` like the poster.
+  paper?: { status: string; href?: string };
 }
 
 // newest first within each section
@@ -21,7 +26,7 @@ export const experience: Role[] = [
     dates: 'June 2026 – August 2026',
     bullets: [
       'Designed and built AI agents and automation workflows with quality engineers, catching spec and datasheet errors before devices release or cause scrap.',
-      'Owned each project end to end, from the initial idea through development, security, deployment, and ongoing maintenance.',
+      'Owned each project end to end, from the development and security through deployment and ongoing maintenance.',
       'Built internal tools for engineers, including a React catalog of team tools with a chat assistant backed by an on-prem model.',
     ],
     tags: ['Python', 'SQL', 'MCP'],
@@ -40,13 +45,14 @@ export const experience: Role[] = [
   {
     section: 'research',
     role: 'Intrusion Detection Researcher',
-    org: 'Texas A&M University',
+    org: 'Texas A&M University, U.S. Space Force',
     dates: 'January 2026 – May 2026',
     bullets: [
       'Built an ML network intrusion dashboard with the U.S. Space Force for defensive cyber operations.',
       'Detected DDoS, spoofing, and jamming attacks in real time, with operator alerts for network health.',
     ],
     tags: ['Python', 'PyTorch'],
+    paper: { status: 'Paper in progress' },
   },
   {
     section: 'research',
@@ -58,6 +64,7 @@ export const experience: Role[] = [
       'Used walk-forward validation and automated tuning so results hold up on unseen data.',
     ],
     tags: ['Python', 'scikit-learn', 'statsmodels'],
-    links: [{ label: 'Poster', href: '/research/cow-calf_poster.pdf' }]
+    links: [{ label: 'Poster', href: '/research/cow-calf_poster.pdf' }],
+    paper: { status: 'Paper under review' },
   },
 ];

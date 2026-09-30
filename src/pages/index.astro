@@ -6,6 +6,7 @@ import RoleList from '../components/RoleList.astro';
 import Typed from '../components/Typed.astro';
 import { site } from '../data/site';
 import { experience } from '../data/experience';
+import { education } from '../data/education';
 
 const jobs = experience.filter((r) => r.section === 'experience');
 const research = experience.filter((r) => r.section === 'research');
@@ -16,9 +17,6 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
   <section class="hero">
     <h1>{site.name}</h1>
     <Typed phrases={site.taglines} />
-    {site.now && (
-      <p class="now"><span class="pulse" aria-hidden="true"></span><b>Now</b><span>{site.now}</span></p>
-    )}
     <div class="icons" aria-label="Contact links">
       <a href={site.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 8.6h3.2V19H4.6zM6.2 3.8a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8Zm3.6 4.8H13v1.4h.1c.4-.8 1.4-1.7 3-1.7 3.2 0 3.8 2.1 3.8 4.9V19h-3.2v-5c0-1.2 0-2.8-1.7-2.8-1.7 0-2 1.3-2 2.7V19H9.8z" fill="currentColor"/></svg>
@@ -35,11 +33,9 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
     </div>
   </section>
 
-  <section class="sec">
-    <div class="sec-head"><h2>Featured projects</h2><a class="sec-link" href="/projects">All projects →</a></div>
-    <div class="feature-grid">
-      {featured.map((project) => <FeatureCard project={project} />)}
-    </div>
+  <section class="sec" id="education">
+    <div class="sec-head"><h2>Education</h2></div>
+    <RoleList roles={education} />
   </section>
 
   <section class="sec" id="experience">
@@ -53,22 +49,17 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
       <RoleList roles={research} />
     </section>
   )}
+
+  <section class="sec" id="projects">
+    <div class="sec-head"><h2>Selected projects</h2><a class="sec-link" href="/projects">All projects →</a></div>
+    <div class="feature-grid">
+      {featured.map((project) => <FeatureCard project={project} showCover={false} />)}
+    </div>
+  </section>
 </Base>
 
 <style>
   .hero h1 { margin: 0; font-weight: 800; letter-spacing: 0.01em; line-height: 0.95; font-size: clamp(2.2rem, 5.2vw, 3.7rem); text-wrap: balance; }
-  .now {
-    margin: 1.1rem 0 0;
-    display: inline-flex; align-items: center; gap: 0.6rem;
-    font-size: 0.9rem;
-    padding: 0.45rem 0.75rem;
-    background: var(--surface);
-    border: 1px solid var(--line-soft);
-    max-width: 100%;
-  }
-  .now b { font: 400 0.66rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-2); }
-  .now .pulse { width: 7px; height: 7px; background: var(--accent-2); flex: 0 0 auto; animation: live 1.6s ease-in-out infinite; }
-  @keyframes live { 50% { opacity: 0.2; } }
   .icons { display: flex; gap: 0.9rem; margin-top: 1.2rem; }
   .icons a { color: var(--text); opacity: 0.82; display: inline-flex; transition: opacity 160ms ease, color 160ms ease; }
   .icons a:hover { opacity: 1; color: var(--accent); }

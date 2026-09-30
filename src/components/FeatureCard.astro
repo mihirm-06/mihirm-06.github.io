@@ -3,13 +3,18 @@ import type { CollectionEntry } from 'astro:content';
 import Cover from './Cover.astro';
 import Tags from './Tags.astro';
 
-interface Props { project: CollectionEntry<'projects'> }
-const { id, data } = Astro.props.project;
+interface Props {
+  project: CollectionEntry<'projects'>;
+  // false hides the card image (the Home page uses text-only cards)
+  showCover?: boolean;
+}
+const { project, showCover = true } = Astro.props;
+const { id, data } = project;
 ---
 
 <a class="feature" href={`/projects/${id}`}>
   <div class="inner">
-    {data.cover && <div class="viz"><Cover name={data.cover} /></div>}
+    {showCover && data.cover && <div class="viz"><Cover name={data.cover} /></div>}
     <div class="body">
       <p class="kicker">{data.kicker}{data.status === 'in progress' && ' · In progress'}</p>
       <h3>{data.title}</h3>

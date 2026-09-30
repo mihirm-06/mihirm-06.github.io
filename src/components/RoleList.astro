@@ -1,7 +1,7 @@
 ---
-// The split layout used by the Experience and Research sections on Home:
-// role, organization, and dates on the left with bullets on the right; below them,
-// links on the left and tags on the right, on the same line.
+// The split layout used by the Education, Experience, and Research sections on Home:
+// role, organization, dates (and paper status) on the left with bullets on the right;
+// below them, links on the left and tags on the right, on the same line.
 import type { Role } from '../data/experience';
 import Tags from './Tags.astro';
 
@@ -10,25 +10,31 @@ const { roles } = Astro.props;
 ---
 
 <div class="split">
-  {roles.map((job) => (
-    <article class="split-item">
-      <div class="split-head">
-        <h3 class="role">{job.role}</h3>
-        <p class="org">{job.org}</p>
-        <p class="date">{job.dates}</p>
-      </div>
-      <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
-      {job.links && job.links.length > 0 && (
-        <p class="role-links">
-          {job.links.map((link) => (
-            <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
-          ))}
-        </p>
-      )}
-      <div class="role-tags"><Tags tags={job.tags} /></div>
-    </article>
-  ))}
+  {roles.map((job) => {
+    const links = [...(job.links ?? [])];
+    if (job.paper?.href) links.push({ label: 'Paper', href: job.paper.href });
+    return (
+      <article class="split-item">
+        <div class="split-head">
+          <h3 class="role">{job.role}</h3>
+          <p class="org">{job.org}</p>
+          <p class="date">{job.dates}</p>
+          {job.paper && <p class="paper-status">{job.paper.status}</p>}
+        </div>
+        <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
+        {links.length > 0 && (
+          <p class="role-links">
+            {links.map((link) => (
+              <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
+            ))}
+          </p>
+        )}
+        <div class="role-tags"><Tags tags={job.tags} /></div>
+      </article>
+    );
+  })}
 </div>
+
 
 <style>
   .split { display: grid; }
@@ -49,6 +55,8 @@ const { roles } = Astro.props;
   .role { margin: 0; font-size: 1.08rem; font-weight: 700; text-wrap: balance; }
   .org { margin: 0.25rem 0 0; opacity: 0.85; font-size: 0.95rem; }
   .split-head .date { margin-top: 0.6rem; }
+  .paper-status { margin: 0.35rem 0 0; font: 400 0.7rem/1.4 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
 
   @media (max-width: 760px) {
     .split-item {

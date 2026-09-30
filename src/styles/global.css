@@ -2,7 +2,7 @@
    green  (--accent)   anything clickable
    blue   (--sec)      dates, labels, bullet markers, chart highlights
    (exception: the hero typing cursor is green)
-   orange (--accent-2) tags and the Now line */
+   orange (--accent-2) tags */
 :root {
   color-scheme: dark;
   --bg: #19211c;
