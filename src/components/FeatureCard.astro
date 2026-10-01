@@ -12,11 +12,16 @@ const { project, showCover = true } = Astro.props;
 const { id, data } = project;
 ---
 
-<a class="feature" href={`/projects/${id}`}>
+<a
+  class="feature"
+  href={`/projects/${id}`}
+  data-type={JSON.stringify(data.type)}
+  data-tags={JSON.stringify(data.tags)}
+>
   <div class="inner">
     {showCover && data.cover && <div class="viz"><Cover name={data.cover} /></div>}
     <div class="body">
-      <p class="kicker">{data.kicker}{data.status === 'in progress' && ' · In progress'}</p>
+      <p class="kicker">{[...data.type, ...(data.status === 'in progress' ? ['In progress'] : [])].join(' · ')}</p>
       <h3>{data.title}</h3>
       <p class="summary">{data.summary}</p>
       <div class="foot-row">
@@ -38,6 +43,7 @@ const { id, data } = project;
     transition: border-color 160ms ease;
   }
   .feature:hover { border-color: var(--accent); }
+  .feature[hidden] { display: none; }
   .inner { display: flex; flex-direction: column; height: 100%; }
   .viz { border-bottom: var(--rule); }
   .body { flex: 1; padding: 1.35rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }

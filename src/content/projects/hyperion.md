@@ -1,7 +1,7 @@
 ---
 title: Hyperion
 summary: Multi-target tracking system that keeps persistent object identities from noisy, gappy sensor measurements.
-kicker: Simulation
+type: [Simulation]
 tags: [C++, Eigen, Python]
 order: 4
 cover: hyperion.svg

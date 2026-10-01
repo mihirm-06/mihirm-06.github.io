@@ -9,8 +9,9 @@ const projects = defineCollection({
     title: z.string(),
     // one line shown on the card
     summary: z.string(),
-    // small blue label above the title, e.g. "Tracking · C++"
-    kicker: z.string(),
+    // kind of project, shown as the blue label above the title, e.g. [Game, AI].
+    // Both type and tags become filters on the Projects page.
+    type: z.array(z.string()).min(1),
     tags: z.array(z.string()).default([]),
     // also show this card on the home page
     featured: z.boolean().default(false),

@@ -53,7 +53,7 @@ Example:
 ---
 title: Hyperion
 summary: Multi-target tracking system that keeps persistent object identities.
-kicker: Simulation
+type: [Simulation]
 tags: [C++, Eigen, Python]
 featured: true
 order: 4
@@ -71,14 +71,20 @@ The text of the write-up starts here.
 |---|---|---|
 | `title` | Yes | The name on the card and in the browser tab. |
 | `summary` | Yes | The one-line description on the card. |
-| `kicker` | Yes | The small blue label above the title. |
+| `type` | Yes | The kind of project, for example `[Game, AI]`. It shows as the small blue label above the title. Write it in square brackets. |
 | `tags` | No | The orange tags on the card. Write them in square brackets. |
 | `featured` | No | Set to `true` to show the card on the Home page. |
 | `order` | No | The position of the card. A higher number comes first. |
-| `status` | No | Set to `in progress` to add "· In progress" after the kicker. |
+| `status` | No | Set to `in progress` to add "· In progress" after the type. |
 | `cover` | No | The file name of the card image in `src/assets/covers/`. |
 
 The build stops if a necessary field is missing. The build also stops if you write a field name incorrectly.
+
+### 3.2.1 Filters on the Projects page
+
+The Projects page has two filter boxes: Type and Tags. Each box shows a list of all the values in the project files. You do not add the values manually.
+
+Use the same spelling and capital letters in all files. For example, do not write `ML` in one file and `Machine Learning` in a different file. If you do, the page shows two different filters.
 
 ### 3.3 Add a project
 

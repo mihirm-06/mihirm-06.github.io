@@ -1,0 +1,124 @@
+---
+// A text box with a dropdown of options you can check. Typing narrows the list;
+// selected values show as small chips inside the box. The behavior lives in the
+// script on the Projects page, which finds every .ms element.
+interface Props {
+  name: string; // e.g. "type", used to read the selection
+  label: string; // shown as the placeholder and read by screen readers
+  options: string[];
+}
+const { name, label, options } = Astro.props;
+const listId = `ms-${name}-list`;
+---
+
+<div class="ms" data-name={name}>
+  <div class="ms-field">
+    <span class="ms-chips"></span>
+    <input
+      class="ms-input"
+      type="text"
+      role="combobox"
+      aria-label={`Filter by ${label.toLowerCase()}`}
+      aria-expanded="false"
+      aria-controls={listId}
+      aria-autocomplete="list"
+      placeholder={label}
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <span class="ms-caret" aria-hidden="true">▾</span>
+  </div>
+  <ul class="ms-list" id={listId} role="listbox" aria-multiselectable="true" aria-label={label} hidden>
+    {options.map((o, i) => (
+      <li class="ms-option" role="option" id={`${listId}-${i}`} data-value={o} aria-selected="false">
+        <span class="ms-check" aria-hidden="true"></span>{o}
+      </li>
+    ))}
+    <li class="ms-empty" hidden>No matches</li>
+  </ul>
+</div>
+
+<style>
+  .ms { position: relative; min-width: 0; --opt-h: 2rem; }
+  .ms-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.5rem;
+    padding: 0.3rem 2rem 0.3rem 0.5rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    cursor: text;
+    position: relative;
+  }
+  .ms-field:focus-within { border-color: var(--accent); }
+  .ms-chips { display: contents; }
+  .ms-input {
+    flex: 1 1 5rem;
+    min-width: 5rem;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font: 400 0.72rem/1.6 var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.2rem;
+  }
+  .ms-input::placeholder { color: var(--muted); }
+  .ms-caret { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.75rem; pointer-events: none; }
+
+  /* selected values inside the box: clickable (to remove), so green */
+  .ms-field :global(.ms-chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font: 400 0.68rem/1 var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    background: rgba(134, 207, 162, 0.08);
+    padding: 0.3rem 0.35rem 0.3rem 0.5rem;
+    cursor: pointer;
+  }
+  .ms-field :global(.ms-chip:hover) { background: rgba(134, 207, 162, 0.16); }
+  .ms-field :global(.ms-chip:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .ms-list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.3rem 0;
+    list-style: none;
+    /* show 3.5 options so the half-cut 4th one hints that the list scrolls */
+    max-height: calc(3.5 * var(--opt-h) + 0.3rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+  .ms-option, .ms-empty {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-sizing: border-box;
+    height: var(--opt-h);
+    padding: 0 0.75rem;
+    font: 400 0.72rem/1.2 var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ms-option { cursor: pointer; }
+  .ms-option[hidden], .ms-empty[hidden] { display: none; }
+  .ms-option.active, .ms-option:hover { background: rgba(227, 235, 223, 0.06); color: var(--text); }
+  .ms-option[aria-selected='true'] { color: var(--accent); }
+  .ms-check { width: 0.8rem; height: 0.8rem; border: 1px solid var(--line); flex: 0 0 auto; }
+  .ms-option[aria-selected='true'] .ms-check { background: var(--accent); border-color: var(--accent); }
+</style>

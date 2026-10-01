@@ -1,7 +1,7 @@
 ---
 title: Weather Impact Score
 summary: A 0–100 score for how weather drives Southwest Airlines delays, diversions, and cancellations, built with Southwest.
-kicker: ML
+type: [ML]
 tags: [Python, Keras]
 featured: true
 order: 3

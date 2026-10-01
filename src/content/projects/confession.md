@@ -1,8 +1,8 @@
 ---
 title: Confession
 summary: A terminal game based on the Roblox game AI Interrogation.
-kicker: Game, AI
-tags: [Textual, Ollama]
+type: [Game, AI]
+tags: [Python, Textual, Ollama]
 status: in progress
 featured: true
 order: 5
