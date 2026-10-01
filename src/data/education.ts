@@ -11,6 +11,7 @@ export const education: Role[] = [
       'GPA: 3.9',
       'Computer Science Honors',
       'EH: EDGE, one of 35 students selected for a global engineering leadership cohort',
+      '3x Dean\'s Honor Roll',
     ],
     tags: [],
   },

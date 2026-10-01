@@ -44,8 +44,20 @@ export const experience: Role[] = [
   },
   {
     section: 'research',
-    role: 'Intrusion Detection Researcher',
-    org: 'Texas A&M University, U.S. Space Force',
+    role: 'Japanese Handwriting Feedback',
+    org: 'Texas A&M Sketch Recognition Lab',
+    dates: 'September 2026 – Present',
+    bullets: [
+      'Building a neural sequence model that identifies stroke-level errors in handwritten Japanese using pen trajectory data.',
+      'Comparing it against a geometric rule-based baseline, and testing whether training on synthetic errors carries over to real learner mistakes.',
+    ],
+    tags: ['Python', 'PyTorch'],
+    paper: { status: 'Paper in progress' },
+  },
+  {
+    section: 'research',
+    role: 'RF Intrusion Detection',
+    org: 'Texas A&M Sketch Recognition Lab & U.S. Space Force',
     dates: 'January 2026 – May 2026',
     bullets: [
       'Built an ML network intrusion dashboard with the U.S. Space Force for defensive cyber operations.',
@@ -56,11 +68,11 @@ export const experience: Role[] = [
   },
   {
     section: 'research',
-    role: 'Price Forecasting Researcher',
-    org: 'Texas A&M University',
+    role: 'Cattle Revenue Forecasting',
+    org: 'Texas A&M Aggie Research Program',
     dates: 'May 2025 – May 2026',
     bullets: [
-      'Built forecasting models (SARIMAX, LightGBM, LSTM) for U.S. calf prices to support cattle ranchers’ decisions.',
+      'Built forecasting models (SARIMAX, LightGBM, LSTM) for U.S. cow-calf prices to support cattle ranchers’ decisions.',
       'Used walk-forward validation and automated tuning so results hold up on unseen data.',
     ],
     tags: ['Python', 'scikit-learn', 'statsmodels'],
