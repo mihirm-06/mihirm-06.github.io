@@ -9,6 +9,7 @@
   --surface: #212b25;
   --text: #e3ebdf;
   --muted: #a3b4a6;
+  --body: #c3cec5;   /* long-form text in project write-ups: brighter than muted for easier reading */
   --line: rgba(227, 235, 223, 0.18);
   --line-soft: rgba(227, 235, 223, 0.09);
   --ink-soft: rgba(227, 235, 223, 0.3);

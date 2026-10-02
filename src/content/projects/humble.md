@@ -3,7 +3,7 @@ title: Humble
 summary: Insult generator built at AI Camp, fine-tuned from GPT-2 (124M) with aitextgen.
 type: [AI]
 tags: [Python, GPT-2, aitextgen]
-order: 2
+order: 1
 cover: humble.png
 ---
 

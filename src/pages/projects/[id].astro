@@ -1,6 +1,8 @@
 ---
 // A project's write-up page: just the Markdown body of its file in src/content/projects.
-// The card fields (summary, kicker, tags, cover) only appear on the cards.
+// The card fields (summary, type, tags, cover) only appear on the cards.
+// Write-ups with 2+ headings (##, ###, or ####) get a table of contents on the right
+// that stays in view while scrolling and highlights the current section.
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
@@ -10,27 +12,93 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
+// every heading below the # title, indented by level
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+const showToc = toc.length >= 2;
 ---
 
 <Base title={project.data.title} description={project.data.summary}>
-  <article class="project">
+  <article class:list={['project', { 'has-toc': showToc }]}>
     <a class="sec-link back" href="/projects">← All projects</a>
     <div class="prose"><Content /></div>
+    {showToc && (
+      <nav class="toc" aria-label="On this page">
+        <p class="kicker toc-label">On this page</p>
+        <ul>
+          {toc.map((h) => (
+            <li class={`depth-${h.depth}`}><a href={`#${h.slug}`} data-slug={h.slug}>{h.text}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
   </article>
 </Base>
+
+<script>
+  // highlight the section currently being read: the last heading that has
+  // scrolled past a line 30% down the screen
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+  if (links.length) {
+    const targets = links.map((a) => document.getElementById(a.dataset.slug!)).filter((el): el is HTMLElement => !!el);
+    // after clicking a link, keep that item highlighted until the reader scrolls
+    // themselves (on short pages the jump can't bring the heading to the top)
+    let pinned: string | null = null;
+    const mark = (slug?: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.slug === slug));
+    const update = () => {
+      if (pinned) return mark(pinned);
+      const line = window.innerHeight * 0.3;
+      let current = targets[0];
+      for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t;
+      // at the very bottom, the last section counts as current even if its heading is low
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = targets.at(-1)!;
+      mark(current?.id);
+    };
+    links.forEach((a) => a.addEventListener('click', () => { pinned = a.dataset.slug!; mark(pinned); }));
+    const unpin = () => { if (pinned) { pinned = null; update(); } };
+    for (const ev of ['wheel', 'touchmove', 'keydown', 'mousedown']) window.addEventListener(ev, unpin, { passive: true });
+    document.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+</script>
 
 <style>
   .project { display: grid; gap: 2.2rem; }
   .back { justify-self: start; }
 
+  /* main column on the left, table of contents on the right edge */
+  .project.has-toc {
+    grid-template-columns: minmax(0, 70ch) minmax(11rem, 15rem);
+    grid-template-areas: "back back" "prose toc";
+    justify-content: space-between;
+    column-gap: 3rem;
+  }
+  .has-toc .back { grid-area: back; }
+  .has-toc .prose { grid-area: prose; }
+
+  .toc { grid-area: toc; align-self: start; position: sticky; top: 2rem; border-left: var(--rule); padding-left: 1.1rem; }
+  .toc-label { margin-bottom: 0.7rem; }
+  .toc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  .toc a { display: block; color: var(--muted); text-decoration: none; font-size: 0.88rem; line-height: 1.4; transition: color 140ms ease; }
+  .toc a:hover { color: var(--accent); }
+  .toc a[aria-current] { color: var(--accent); font-weight: 600; }
+  .toc .depth-3 a { padding-left: 0.9rem; font-size: 0.82rem; }
+  .toc .depth-4 a { padding-left: 1.8rem; font-size: 0.8rem; }
+  .prose :global(h2), .prose :global(h3), .prose :global(h4) { scroll-margin-top: 1.5rem; }
+
+  @media (max-width: 900px) {
+    .project.has-toc { grid-template-columns: minmax(0, 1fr); grid-template-areas: "back" "prose"; }
+    .toc { display: none; }
+  }
+
   .prose { max-width: 70ch; font-size: 1.02rem; line-height: 1.75; }
   .prose > :global(:first-child) { margin-top: 0; }
-  .prose :global(h1) { margin: 0 0 1rem; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; line-height: 1; text-wrap: balance; }
+  .prose :global(h1) { margin: 0 0 1rem; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; line-height: 1; }
   .prose :global(h2) { margin: 2.2rem 0 0.6rem; font-size: 1.25rem; font-weight: 700; }
   .prose :global(h3) { margin: 1.8rem 0 0.5rem; font-size: 1.08rem; font-weight: 700; }
   .prose :global(p) { margin: 0 0 1rem; }
-  .prose :global(p), .prose :global(li) { color: var(--muted); }
+  .prose :global(p), .prose :global(li) { color: var(--body); }
   .prose :global(strong) { color: var(--text); font-weight: 700; }
   .prose :global(ul), .prose :global(ol) { margin: 0 0 1rem; padding-left: 1.2rem; }
   .prose :global(li + li) { margin-top: 0.35rem; }

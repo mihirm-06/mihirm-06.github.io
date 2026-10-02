@@ -4,7 +4,7 @@ summary: A 0–100 score for how weather drives Southwest Airlines delays, diver
 type: [ML]
 tags: [Python, Keras]
 featured: true
-order: 3
+order: 2
 cover: southwest.png
 ---
 

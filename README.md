@@ -127,6 +127,8 @@ The card crops the image from the center to fill a wide frame. The best size is 
 
 The write-up page shows only the bottom part of the file. The page does not show the card fields. Thus, start the write-up with a title line, for example `# Hyperion`.
 
+If the write-up has two or more section headings (`## Heading`), the page shows a table of contents on the right side. The table of contents stays on the screen when you scroll. It shows the section headings and the subsection headings (`### Heading`). On narrow screens, the page does not show the table of contents.
+
 Use standard Markdown:
 
 | To add | Write |

@@ -5,10 +5,10 @@ type: [Game, AI]
 tags: [Python, Textual, Ollama]
 status: in progress
 featured: true
-order: 5
+order: 4
 cover: confession.png
 ---
 
 # Confession
 
-Confession is a terminal game inspired by the AI interrogation games on Roblox. It's in progress, and a full write-up is coming once there's something to play.
+Confession is a terminal game inspired by the AI interrogation Roblox game. It's in progress, and a full write-up is coming once there's something to play.
