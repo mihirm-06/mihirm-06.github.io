@@ -60,8 +60,12 @@ const tocItems = toc.map((h) => ({ slug: h.slug, text: h.text, depth: h.depth })
     text-transform: uppercase;
     color: var(--accent);
   }
-  .toc-mobile summary::marker { content: "▸\00a0"; }
-  .toc-mobile[open] summary::marker { content: "▾\00a0"; }
+  /* The arrow is drawn here and not with ::marker, because phone browsers (Safari) ignore
+     ::marker content and show their own arrow with no space after it. */
+  .toc-mobile summary { list-style: none; }
+  .toc-mobile summary::-webkit-details-marker { display: none; }
+  .toc-mobile summary::before { content: "▸"; display: inline-block; margin-right: 1ch; }
+  .toc-mobile[open] summary::before { content: "▾"; }
   .toc-mobile[open] summary { border-bottom: 1px solid var(--line-soft); }
   .toc-mobile :global(.toc) { border-left: 0; padding: 0.9rem 1rem 1rem; }
   .toc-mobile :global(.toc-label) { display: none; }
