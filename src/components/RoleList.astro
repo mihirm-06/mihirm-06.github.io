@@ -29,7 +29,7 @@ const { roles } = Astro.props;
             ))}
           </p>
         )}
-        <div class="role-tags"><Tags tags={job.tags} /></div>
+        {job.tags.length > 0 && <div class="role-tags"><Tags tags={job.tags} /></div>}
       </article>
     );
   })}
@@ -58,12 +58,12 @@ const { roles } = Astro.props;
   .paper-status { margin: 0.35rem 0 0; font: 400 0.7rem/1.4 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
 
+  /* phones: a simple column. Only the parts an entry has take up space, so empty rows
+     (no tags, no links) don't add extra gap and every entry ends with the same spacing. */
   @media (max-width: 760px) {
-    .split-item {
-      grid-template-columns: 1fr;
-      grid-template-areas: "head" "bullets" "tags" "links";
-      row-gap: 0.8rem;
-    }
+    .split-item { display: flex; flex-direction: column; gap: 0.8rem; }
+    .role-tags { order: 1; }
+    .role-links { order: 2; }
     .role-links, .role-tags { margin-top: 0; }
   }
 </style>

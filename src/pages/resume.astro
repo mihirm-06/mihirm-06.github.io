@@ -16,31 +16,33 @@ const toc = [
 ---
 
 <Base title="Résumé" description="Education, experience, and research of Mihir Mankikar.">
-  <section class="sec">
-    <div class="sec-head"><h1>Résumé</h1><a class="sec-link" href={site.resume} download>Download PDF ↓</a></div>
-    <nav class="jump" aria-label="On this page">
-      <span class="kicker">Scroll to:</span>
-      {toc.map(({ slug, text }) => <a href={`#${slug}`}>{text}</a>)}
-    </nav>
-  </section>
-
-  <div class="sections">
-    <section class="sec" id="education">
-      <div class="sec-head"><h2>Education</h2></div>
-      <RoleList roles={education} />
+  <div class="resume">
+    <section class="sec">
+      <div class="sec-head"><h1>Résumé</h1><a class="sec-link" href={site.resume} download>Download PDF ↓</a></div>
+      <nav class="jump" aria-label="On this page">
+        <span class="kicker">Scroll to:</span>
+        {toc.map(({ slug, text }) => <a href={`#${slug}`}>{text}</a>)}
+      </nav>
     </section>
 
-    <section class="sec" id="experience">
-      <div class="sec-head"><h2>Experience</h2></div>
-      <RoleList roles={jobs} />
-    </section>
-
-    {research.length > 0 && (
-      <section class="sec" id="research">
-        <div class="sec-head"><h2>Research</h2></div>
-        <RoleList roles={research} />
+    <div class="sections">
+      <section class="sec" id="education">
+        <div class="sec-head"><h2>Education</h2></div>
+        <RoleList roles={education} />
       </section>
-    )}
+
+      <section class="sec" id="experience">
+        <div class="sec-head"><h2>Experience</h2></div>
+        <RoleList roles={jobs} />
+      </section>
+
+      {research.length > 0 && (
+        <section class="sec" id="research">
+          <div class="sec-head"><h2>Research</h2></div>
+          <RoleList roles={research} />
+        </section>
+      )}
+    </div>
   </div>
 </Base>
 
@@ -62,6 +64,11 @@ const toc = [
     .jump { flex-direction: column; gap: 0.5rem; }
     .jump a + a::before { content: none; }
   }
-  .sections { display: grid; gap: 4.5rem; }
+  /* --gap is the space between sections. On phones each entry ends with about 19px of padding,
+     so 1.6rem more makes a visible gap of about 45px, and --title-gap gives the title block
+     and Education the same 45px. */
+  .resume { --gap: 4.5rem; --title-gap: var(--gap); display: grid; gap: var(--title-gap); }
+  .sections { display: grid; gap: var(--gap); }
   section[id] { scroll-margin-top: 1.5rem; }
+  @media (max-width: 760px) { .resume { --gap: 1.6rem; --title-gap: 2.8rem; } }
 </style>
