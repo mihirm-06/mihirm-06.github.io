@@ -5,7 +5,7 @@ export const site = {
   intro: 'I study computer science and statistics at Texas A&M.',
   // the line below it: the lead-in stays, and the hero types out each phrase after it, in order
   taglinePrefix: "I'm also a",
-  taglines: ['musician.', 'machine learning researcher.', 'space enthusiast.', 'gamer.', 'Tolkien fan.'],
+  taglines: ['musician.', 'machine learning researcher.', 'space enthusiast.', 'Tolkien fan.'],
   resume: '/assets/Mihir_Mankikar_resume.pdf',
   links: {
     linkedin: 'https://linkedin.com/in/mihirm06',
