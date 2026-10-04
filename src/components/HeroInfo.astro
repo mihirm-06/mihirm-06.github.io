@@ -1,5 +1,15 @@
 ---
 import { place } from '../data/now';
+import { fetchWeather, describe, type Weather } from '../lib/weather';
+
+// Fetched while the site builds, so the first paint already has the weather. The deploy
+// workflow rebuilds the site every 30 minutes, and the browser refreshes it after that.
+// If the fetch fails the line starts empty and the browser fills it in.
+let baked: (Weather & { at: number }) | null = null;
+try {
+  baked = { ...(await fetchWeather(AbortSignal.timeout(5000))), at: Date.now() };
+} catch {}
+const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(baked.temp)}°F` };
 ---
 
 <div class="info">
@@ -7,32 +17,19 @@ import { place } from '../data/now';
     <span class="ico" data-daynight aria-hidden="true"></span>
     <span data-time>&nbsp;</span>
   </p>
-  <p class="line" data-weather hidden>
-    <span class="ico" data-wicon aria-hidden="true"></span>
-    <span>It's <strong data-temp></strong> and <span data-cond></span> in <strong>{place.name}</strong>.</span>
+  <p class="line weather" data-weather data-baked={baked && JSON.stringify(baked)} data-ready={now?.text ? '' : undefined}>
+    <span class="ico" data-wicon aria-hidden="true" set:html={now?.icon}></span>
+    <span>It's <strong data-temp>{now?.temp}</strong> and <span data-cond>{now?.text}</span> in <strong>{place.name}</strong>.</span>
   </p>
 </div>
 
 <script>
   import { place } from '../data/now';
+  import { fetchWeather, describe, icons, type Weather } from '../lib/weather';
 
   const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s);
   const timeEl = $('[data-time]');
   const dayNightEl = $('[data-daynight]');
-
-  // ---------- icons ----------
-  const stroke = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
-  const svg = (inner: string) => `<svg viewBox="0 0 24 24" ${stroke}>${inner}</svg>`;
-  const body = '<path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/>';
-  const icons = {
-    sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>'),
-    moon: svg('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
-    cloud: svg('<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9z"/>'),
-    fog: svg(body + '<path d="M16 17H7M17 21H9"/>'),
-    rain: svg(body + '<path d="M16 14v6M8 14v6M12 16v6"/>'),
-    snow: svg(body + '<path d="M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01" stroke-width="2.2"/>'),
-    storm: svg('<path d="M6 16.3A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 .5 9"/><path d="m13 12-3 5h4l-3 5"/>'),
-  };
 
   // ---------- date and time in the city, not the visitor's time zone ----------
   const clock = new Intl.DateTimeFormat('en-US', {
@@ -53,61 +50,46 @@ import { place } from '../data/now';
   tick();
   setInterval(tick, 10_000);
 
-  // ---------- weather from Open-Meteo (no key, no account) ----------
-  const describe = (code: number, day: boolean): [string, string] => {
-    if (code === 0 || code === 1) return ['clear', day ? icons.sun : icons.moon];
-    if (code === 2) return ['partly cloudy', icons.cloud];
-    if (code === 3) return ['overcast', icons.cloud];
-    if (code === 45 || code === 48) return ['foggy', icons.fog];
-    if (code >= 51 && code <= 57) return ['drizzling', icons.rain];
-    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return ['raining', icons.rain];
-    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snowing', icons.snow];
-    if (code >= 95) return ['stormy', icons.storm];
-    return ['', icons.cloud];
-  };
-  type Weather = { temp: number; code: number; day: boolean };
+  // ---------- weather ----------
+  const weatherEl = $('[data-weather]')!;
   const show = ({ temp, code, day }: Weather) => {
-    const [cond, icon] = describe(code, day);
-    if (!cond) return;
+    const { text, icon } = describe(code, day);
+    if (!text) return;
     $('[data-temp]')!.textContent = `${Math.round(temp)}°F`;
-    $('[data-cond]')!.textContent = cond;
+    $('[data-cond]')!.textContent = text;
     $('[data-wicon]')!.innerHTML = icon;
-    $('[data-weather]')!.hidden = false;
+    weatherEl.dataset.ready = '';
   };
 
-  // reuse the last answer for 10 minutes. Storage can be blocked, so every access is guarded.
-  const KEY = 'weather-v3';
-  const read = (): Weather | null => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-      return saved && Date.now() - saved.at < 10 * 60_000 ? saved.data : null;
-    } catch { return null; }
+  // Use the newest answer we have: the one baked into the page at build time or the one
+  // saved in this browser. Show it straight away, even if it is old, and refresh it once
+  // it is more than 10 minutes old. Storage can be blocked, so every access is guarded.
+  const KEY = 'weather-v4';
+  type Saved = { data: Weather; at: number };
+  const readSaved = (): Saved | null => {
+    try { return JSON.parse(localStorage.getItem(KEY) ?? 'null'); } catch { return null; }
   };
   const save = (data: Weather) => { try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data })); } catch {} };
+  const baked = JSON.parse(weatherEl.dataset.baked || 'null') as (Weather & { at: number }) | null;
 
-  (async () => {
-    const cached = read();
-    if (cached) return show(cached);
-    try {
-      const url =
-        `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}` +
-        `&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&timezone=${encodeURIComponent(place.timeZone)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(String(res.status));
-      const { current } = await res.json();
-      const data: Weather = { temp: current.temperature_2m, code: current.weather_code, day: current.is_day === 1 };
-      show(data);
-      save(data);
-    } catch {
-      // leave the weather line hidden: the date and time still show
-    }
-  })();
+  const candidates: Saved[] = [readSaved(), baked && { data: baked, at: baked.at }].filter((c): c is Saved => !!c);
+  const newest = candidates.sort((a, b) => b.at - a.at)[0];
+  if (newest) show(newest.data);
+
+  if (!newest || Date.now() - newest.at > 10 * 60_000) {
+    fetchWeather().then((data) => { show(data); save(data); }).catch(() => {
+      // keep whatever is on screen (or nothing): the date and time still show
+    });
+  }
 </script>
 
 <style>
   .info { margin-top: 1.5rem; display: grid; gap: 0.55rem; }
   .line { margin: 0; display: flex; align-items: center; gap: 0.7rem; min-height: 1.5em; }
-  .line[hidden] { display: none; }
+  /* the weather line keeps its space and fades in when the data arrives */
+  .weather { opacity: 0; transition: opacity 400ms ease; }
+  .weather[data-ready] { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .weather { transition: none; } }
   .date { color: var(--sec); }
   strong { font-weight: 700; }
   .ico { color: var(--accent-2); flex: none; width: 1.25rem; height: 1.25rem; display: inline-flex; }

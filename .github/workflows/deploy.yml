@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # rebuild every 30 minutes so the weather baked into the Home page stays fresh
+  # (GitHub may start scheduled runs late)
+  schedule:
+    - cron: '*/30 * * * *'
 
 permissions:
   contents: read
