@@ -9,15 +9,17 @@ interface Props {
   title: string;
   // file name in src/assets/now
   cover: string;
+  // optional link, e.g. the song, game, or video. Without it the tile is not clickable.
+  href?: string;
 }
-const { label, title, cover } = Astro.props;
+const { label, title, cover, href } = Astro.props;
 
 const photos = import.meta.glob<ImageMetadata>('../../assets/now/*.{png,jpg,jpeg,webp,avif}', { import: 'default', eager: true });
 const photo = photos[`../../assets/now/${cover}`];
 if (!photo) throw new Error(`Missing cover: src/assets/now/${cover}`);
 ---
 
-<Tile label={label}>
+<Tile label={label} href={href}>
   <Fragment slot="thumb">
     <Image src={photo} alt="" widths={[128, 256]} sizes="128px" />
   </Fragment>

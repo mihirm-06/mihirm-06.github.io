@@ -5,11 +5,16 @@ interface Props {
   label: string;
   href?: string;
 }
-const { label, href } = Astro.props;
+const { label } = Astro.props;
+// A link with no "https://" in front (like www.youtube.com/...) would be read as a page on this
+// site, so add it. Paths that start with "/" are pages on this site and stay as they are.
+const href = Astro.props.href && !/^(https?:|\/)/.test(Astro.props.href) ? `https://${Astro.props.href}` : Astro.props.href;
 const Tag = href ? 'a' : 'div';
+// links to other sites open in a new tab
+const external = href?.startsWith('http');
 ---
 
-<Tag class:list={['tile', { link: href }]} href={href}>
+<Tag class:list={['tile', { link: href }]} href={href || undefined} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>
   <div class="thumb"><slot name="thumb" /></div>
   <div class="text">
     <p class="kicker">{label}</p>
