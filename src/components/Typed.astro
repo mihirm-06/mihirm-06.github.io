@@ -10,6 +10,12 @@ const { phrases } = Astro.props;
   <span class="typed" data-phrases={JSON.stringify(phrases)}>{phrases[0]}</span><span class="cursor" aria-hidden="true"></span>
 </p>
 
+<!-- Empties the line as soon as it is parsed, so the full phrase never flashes before the
+     typing starts. Without JavaScript or with reduced motion, the first phrase stays. -->
+<script is:inline>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('.typed').textContent = '';
+</script>
+
 <script>
   const el = document.querySelector<HTMLElement>('.typed');
   const cursor = document.querySelector<HTMLElement>('.tagline .cursor');

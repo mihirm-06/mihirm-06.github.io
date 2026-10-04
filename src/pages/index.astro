@@ -38,6 +38,11 @@ import { site } from '../data/site';
 </Base>
 
 <style>
+  /* the hero and tiles fade in on load, which hides fonts and images settling into place */
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .hero, .tiles { animation: fade-in 350ms ease both; }
+  @media (prefers-reduced-motion: reduce) { .hero, .tiles { animation: none; } }
+
   .hero h1 { margin: 0; font-weight: 800; letter-spacing: 0.01em; line-height: 0.95; font-size: clamp(2.2rem, 5.2vw, 3.7rem); text-wrap: balance; }
   .icons { display: flex; gap: 1.2rem; margin-top: 1.2rem; }
   .icons a { color: var(--text); opacity: 0.82; display: inline-flex; transition: opacity 160ms ease, color 160ms ease; }
