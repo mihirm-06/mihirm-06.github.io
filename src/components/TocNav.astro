@@ -1,0 +1,60 @@
+---
+// "On this page" list that stays in view while scrolling and highlights the section being read.
+// Each item's `slug` is the id of the element it scrolls to. `depth` (2-4) indents it.
+// `inline` puts it in the page flow, with no sticky position and no highlighting.
+interface Props { items: { slug: string; text: string; depth?: number }[]; inline?: boolean }
+const { items, inline = false } = Astro.props;
+---
+
+<nav class:list={['toc', { inline }]} aria-label="On this page">
+  <p class="kicker toc-label">On this page</p>
+  <ul>
+    {items.map((h) => (
+      <li class={`depth-${h.depth ?? 2}`}><a href={`#${h.slug}`} data-slug={h.slug}>{h.text}</a></li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  // highlight the section currently being read: the last heading that has
+  // scrolled past a line 30% down the screen
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc:not(.inline) a')];
+  if (links.length) {
+    const targets = links.map((a) => document.getElementById(a.dataset.slug!)).filter((el): el is HTMLElement => !!el);
+    // after clicking a link, keep that item highlighted until the reader scrolls
+    // themselves (on short pages the jump can't bring the heading to the top)
+    let pinned: string | null = null;
+    const mark = (slug?: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.slug === slug));
+    const update = () => {
+      if (pinned) return mark(pinned);
+      const line = window.innerHeight * 0.3;
+      let current = targets[0];
+      for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t;
+      // at the very bottom, the last section counts as current even if its heading is low
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = targets.at(-1)!;
+      mark(current?.id);
+    };
+    links.forEach((a) => a.addEventListener('click', () => { pinned = a.dataset.slug!; mark(pinned); }));
+    const unpin = () => { if (pinned) { pinned = null; update(); } };
+    for (const ev of ['wheel', 'touchmove', 'keydown', 'mousedown']) window.addEventListener(ev, unpin, { passive: true });
+    document.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+</script>
+
+<style>
+  .toc { align-self: start; position: sticky; top: 2rem; border-left: var(--rule); padding-left: 1.1rem; }
+  .toc.inline { position: static; justify-self: start; }
+  .toc-label { margin-bottom: 0.7rem; }
+  .toc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  .toc a { display: block; color: var(--muted); text-decoration: none; font-size: 0.88rem; line-height: 1.4; transition: color 140ms ease; }
+  .toc a:hover { color: var(--accent); }
+  .toc a[aria-current] { color: var(--accent); font-weight: 600; }
+  .toc .depth-3 a { padding-left: 0.9rem; font-size: 0.82rem; }
+  .toc .depth-4 a { padding-left: 1.8rem; font-size: 0.8rem; }
+
+  @media (max-width: 900px) {
+    .toc:not(.inline) { display: none; }
+  }
+</style>

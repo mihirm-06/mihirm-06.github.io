@@ -153,7 +153,7 @@ To add a YouTube video, copy the embed code from YouTube. Then put the `<iframe>
 
 ## 4. Education, Experience, and Research
 
-The Home page shows these sections in this order: Education, Experience, Research, and Selected projects.
+The Résumé page (`/resume`) shows these sections in this order: Education, Experience, and Research.
 
 The data for Education is in `src/data/education.ts`. The data for Experience and Research is in `src/data/experience.ts`.
 

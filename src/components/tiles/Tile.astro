@@ -1,0 +1,55 @@
+---
+// One dashboard tile: a square picture flush on the left, text on the right.
+// Give it `href` to make the whole tile a link.
+interface Props {
+  label: string;
+  href?: string;
+}
+const { label, href } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag class:list={['tile', { link: href }]} href={href}>
+  <div class="thumb"><slot name="thumb" /></div>
+  <div class="text">
+    <p class="kicker">{label}</p>
+    <slot />
+  </div>
+</Tag>
+
+<style>
+  .tile {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    min-width: 0;
+    transition: border-color 160ms ease;
+  }
+  .tile.link:hover { border-color: var(--accent); }
+  .thumb {
+    flex: none;
+    width: 8rem;
+    aspect-ratio: 1;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    line-height: 0;
+    background: var(--bg);
+    border-right: 1px solid var(--line-soft);
+  }
+  .thumb :global(img), .thumb :global(svg) { display: block; width: 100%; height: 100%; }
+  .thumb :global(img) { object-fit: cover; }
+  .text { min-width: 0; padding: 1rem 1.3rem; display: grid; gap: 0.45rem; align-content: center; }
+  .text :global(.t-line) { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.7rem; }
+  .text :global(.t-title) { font-size: 1.2rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+  .text :global(.t-sub) { color: var(--muted); font-size: 1rem; }
+  .link:hover .text :global(.t-title) { color: var(--accent); }
+
+  @media (max-width: 420px) {
+    .thumb { width: 6rem; }
+    .text { padding: 0.8rem 1rem; }
+  }
+</style>

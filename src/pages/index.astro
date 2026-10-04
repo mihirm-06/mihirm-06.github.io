@@ -1,16 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import FeatureCard from '../components/FeatureCard.astro';
-import RoleList from '../components/RoleList.astro';
 import Typed from '../components/Typed.astro';
+import HeroInfo from '../components/HeroInfo.astro';
+import NowTile from '../components/tiles/NowTile.astro';
+import ProjectTile from '../components/tiles/ProjectTile.astro';
+import { listening, playing, practicing } from '../data/now';
 import { site } from '../data/site';
-import { experience } from '../data/experience';
-import { education } from '../data/education';
-
-const jobs = experience.filter((r) => r.section === 'experience');
-const research = experience.filter((r) => r.section === 'research');
-const featured = (await getCollection('projects', ({ data }) => data.featured)).sort((a, b) => b.data.order - a.data.order);
 ---
 
 <Base>
@@ -31,43 +26,26 @@ const featured = (await getCollection('projects', ({ data }) => data.featured)).
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.8h8.7L19 8v12.2H6z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14.7 3.8V8H19" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 11h7.4M8.8 14h7.4M8.8 17h5.1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
     </div>
+    <HeroInfo />
   </section>
 
-  <section class="sec" id="education">
-    <div class="sec-head"><h2>Education</h2></div>
-    <RoleList roles={education} />
-  </section>
-
-  <section class="sec" id="experience">
-    <div class="sec-head"><h2>Experience</h2><a class="sec-link" href={site.resume} download>Download résumé ↓</a></div>
-    <RoleList roles={jobs} />
-  </section>
-
-  {research.length > 0 && (
-    <section class="sec" id="research">
-      <div class="sec-head"><h2>Research</h2></div>
-      <RoleList roles={research} />
-    </section>
-  )}
-
-  <section class="sec" id="projects">
-    <div class="sec-head"><h2>Selected projects</h2><a class="sec-link" href="/projects">All projects →</a></div>
-    <div class="feature-grid">
-      {featured.map((project) => <FeatureCard project={project} showCover={false} />)}
-    </div>
+  <section class="tiles" aria-label="At a glance">
+    <ProjectTile />
+    <NowTile label="Listening to" title={listening.title} cover={listening.cover} />
+    <NowTile label="Playing" title={playing.title} cover={playing.cover} />
+    <NowTile label="Practicing" title={practicing.title} cover={practicing.cover} />
   </section>
 </Base>
 
 <style>
   .hero h1 { margin: 0; font-weight: 800; letter-spacing: 0.01em; line-height: 0.95; font-size: clamp(2.2rem, 5.2vw, 3.7rem); text-wrap: balance; }
-  .icons { display: flex; gap: 0.9rem; margin-top: 1.2rem; }
+  .icons { display: flex; gap: 1.2rem; margin-top: 1.2rem; }
   .icons a { color: var(--text); opacity: 0.82; display: inline-flex; transition: opacity 160ms ease, color 160ms ease; }
   .icons a:hover { opacity: 1; color: var(--accent); }
-  .icons svg { width: 1.2rem; height: 1.2rem; }
+  .icons svg { width: 1.6rem; height: 1.6rem; }
 
-  .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-
+  .tiles { max-width: 52rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   @media (max-width: 760px) {
-    .feature-grid { grid-template-columns: 1fr; }
+    .tiles { grid-template-columns: 1fr; }
   }
 </style>

@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+import RoleList from '../components/RoleList.astro';
+import { site } from '../data/site';
+import { experience } from '../data/experience';
+import { education } from '../data/education';
+
+const jobs = experience.filter((r) => r.section === 'experience');
+const research = experience.filter((r) => r.section === 'research');
+// links in the "Scroll to" line: each slug is the id of a section below
+const toc = [
+  { slug: 'education', text: 'Education' },
+  { slug: 'experience', text: 'Experience' },
+  ...(research.length > 0 ? [{ slug: 'research', text: 'Research' }] : []),
+];
+---
+
+<Base title="Résumé" description="Education, experience, and research of Mihir Mankikar.">
+  <section class="sec">
+    <div class="sec-head"><h1>Résumé</h1><a class="sec-link" href={site.resume} download>Download PDF ↓</a></div>
+    <nav class="jump" aria-label="On this page">
+      <span class="kicker">Scroll to:</span>
+      {toc.map(({ slug, text }) => <a href={`#${slug}`}>{text}</a>)}
+    </nav>
+  </section>
+
+  <div class="sections">
+    <section class="sec" id="education">
+      <div class="sec-head"><h2>Education</h2></div>
+      <RoleList roles={education} />
+    </section>
+
+    <section class="sec" id="experience">
+      <div class="sec-head"><h2>Experience</h2></div>
+      <RoleList roles={jobs} />
+    </section>
+
+    {research.length > 0 && (
+      <section class="sec" id="research">
+        <div class="sec-head"><h2>Research</h2></div>
+        <RoleList roles={research} />
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .jump { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 0.6rem; }
+  .jump a {
+    font: 400 0.72rem/1.4 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .jump a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+  /* a dot between links, not after the last one */
+  .jump a + a::before { content: "•"; display: inline-block; margin-right: 0.6rem; color: var(--muted); }
+
+  /* phones: one item per line, no bullets */
+  @media (max-width: 760px) {
+    .jump { flex-direction: column; gap: 0.5rem; }
+    .jump a + a::before { content: none; }
+  }
+  .sections { display: grid; gap: 4.5rem; }
+  section[id] { scroll-margin-top: 1.5rem; }
+</style>

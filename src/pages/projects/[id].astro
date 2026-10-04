@@ -3,8 +3,10 @@
 // The card fields (summary, type, tags, cover) only appear on the cards.
 // Write-ups with 2+ headings (##, ###, or ####) get a table of contents on the right
 // that stays in view while scrolling and highlights the current section.
+// On narrow screens the same list is a collapsed "On this page" box above the write-up.
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import TocNav from '../../components/TocNav.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -16,52 +18,22 @@ const { Content, headings } = await render(project);
 // every heading below the # title, indented by level
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
 const showToc = toc.length >= 2;
+const tocItems = toc.map((h) => ({ slug: h.slug, text: h.text, depth: h.depth }));
 ---
 
 <Base title={project.data.title} description={project.data.summary}>
   <article class:list={['project', { 'has-toc': showToc }]}>
     <a class="sec-link back" href="/projects">← All projects</a>
-    <div class="prose"><Content /></div>
     {showToc && (
-      <nav class="toc" aria-label="On this page">
-        <p class="kicker toc-label">On this page</p>
-        <ul>
-          {toc.map((h) => (
-            <li class={`depth-${h.depth}`}><a href={`#${h.slug}`} data-slug={h.slug}>{h.text}</a></li>
-          ))}
-        </ul>
-      </nav>
+      <details class="toc-mobile">
+        <summary>On this page</summary>
+        <TocNav items={tocItems} inline />
+      </details>
     )}
+    <div class="prose"><Content /></div>
+    {showToc && <TocNav items={tocItems} />}
   </article>
 </Base>
-
-<script>
-  // highlight the section currently being read: the last heading that has
-  // scrolled past a line 30% down the screen
-  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
-  if (links.length) {
-    const targets = links.map((a) => document.getElementById(a.dataset.slug!)).filter((el): el is HTMLElement => !!el);
-    // after clicking a link, keep that item highlighted until the reader scrolls
-    // themselves (on short pages the jump can't bring the heading to the top)
-    let pinned: string | null = null;
-    const mark = (slug?: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.slug === slug));
-    const update = () => {
-      if (pinned) return mark(pinned);
-      const line = window.innerHeight * 0.3;
-      let current = targets[0];
-      for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t;
-      // at the very bottom, the last section counts as current even if its heading is low
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = targets.at(-1)!;
-      mark(current?.id);
-    };
-    links.forEach((a) => a.addEventListener('click', () => { pinned = a.dataset.slug!; mark(pinned); }));
-    const unpin = () => { if (pinned) { pinned = null; update(); } };
-    for (const ev of ['wheel', 'touchmove', 'keydown', 'mousedown']) window.addEventListener(ev, unpin, { passive: true });
-    document.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
-  }
-</script>
 
 <style>
   .project { display: grid; gap: 2.2rem; }
@@ -76,20 +48,29 @@ const showToc = toc.length >= 2;
   }
   .has-toc .back { grid-area: back; }
   .has-toc .prose { grid-area: prose; }
+  .has-toc :global(.toc) { grid-area: toc; }
 
-  .toc { grid-area: toc; align-self: start; position: sticky; top: 2rem; border-left: var(--rule); padding-left: 1.1rem; }
-  .toc-label { margin-bottom: 0.7rem; }
-  .toc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
-  .toc a { display: block; color: var(--muted); text-decoration: none; font-size: 0.88rem; line-height: 1.4; transition: color 140ms ease; }
-  .toc a:hover { color: var(--accent); }
-  .toc a[aria-current] { color: var(--accent); font-weight: 600; }
-  .toc .depth-3 a { padding-left: 0.9rem; font-size: 0.82rem; }
-  .toc .depth-4 a { padding-left: 1.8rem; font-size: 0.8rem; }
+  /* narrow screens: the sidebar is hidden and this collapsed box takes its place */
+  .toc-mobile { display: none; grid-area: mtoc; border: 1px solid var(--line); background: var(--surface); }
+  .toc-mobile summary {
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    font: 400 0.72rem/1 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .toc-mobile summary::marker { content: "▸\00a0"; }
+  .toc-mobile[open] summary::marker { content: "▾\00a0"; }
+  .toc-mobile[open] summary { border-bottom: 1px solid var(--line-soft); }
+  .toc-mobile :global(.toc) { border-left: 0; padding: 0.9rem 1rem 1rem; }
+  .toc-mobile :global(.toc-label) { display: none; }
+
   .prose :global(h2), .prose :global(h3), .prose :global(h4) { scroll-margin-top: 1.5rem; }
 
   @media (max-width: 900px) {
-    .project.has-toc { grid-template-columns: minmax(0, 1fr); grid-template-areas: "back" "prose"; }
-    .toc { display: none; }
+    .project.has-toc { grid-template-columns: minmax(0, 1fr); grid-template-areas: "back" "mtoc" "prose"; }
+    .toc-mobile { display: block; }
   }
 
   .prose { max-width: 70ch; font-size: 1.02rem; line-height: 1.75; }
