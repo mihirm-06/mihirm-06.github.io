@@ -311,7 +311,9 @@ All of this text is in `src/data/site.ts`.
 
 | Field | What it does |
 |---|---|
-| `taglines` | The phrases that the Home page types below your name. |
+| `intro` | The sentence under your name on the Home page. |
+| `taglinePrefix` | The words that stay in place before the typed phrases, for example "I'm also a". |
+| `taglines` | The phrases that the Home page types after the lead-in. |
 | `resume` | The path of the résumé file. |
 | `links` | Your LinkedIn, GitHub, and email address. |
 | `description` | The text that search engines and link previews show. |

@@ -2,12 +2,12 @@
 // Types out each phrase, deletes it, moves to the next. Shows the first phrase statically
 // without JavaScript or with reduced motion. The cursor stays solid while typing or
 // deleting and blinks while paused.
-interface Props { phrases: string[] }
-const { phrases } = Astro.props;
+interface Props { phrases: string[]; prefix?: string }
+const { phrases, prefix } = Astro.props;
 ---
 
 <p class="tagline">
-  <span class="typed" data-phrases={JSON.stringify(phrases)}>{phrases[0]}</span><span class="cursor" aria-hidden="true"></span>
+  {prefix && <span>{prefix}&nbsp;</span>}<span class="typed" data-phrases={JSON.stringify(phrases)}>{phrases[0]}</span><span class="cursor" aria-hidden="true"></span>
 </p>
 
 <!-- Empties the line as soon as it is parsed, so the full phrase never flashes before the
