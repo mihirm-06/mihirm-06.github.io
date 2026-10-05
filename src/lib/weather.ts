@@ -15,6 +15,20 @@ export async function fetchWeather(signal?: AbortSignal): Promise<Weather> {
   return { temp: current.temperature_2m, code: current.weather_code, day: current.is_day === 1 };
 }
 
+// Used while the site builds (and by the dev server). The answer is kept for 10 minutes, so
+// reloading a page in dev does not wait on Open-Meteo every time. Returns null if it fails.
+let kept: { at: number; data: Weather } | null = null;
+export async function buildTimeWeather(): Promise<Weather | null> {
+  if (kept && Date.now() - kept.at < 10 * 60_000) return kept.data;
+  try {
+    const data = await fetchWeather(AbortSignal.timeout(5000));
+    kept = { at: Date.now(), data };
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 // ---------- icons ----------
 const stroke = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
 const svg = (inner: string) => `<svg viewBox="0 0 24 24" ${stroke}>${inner}</svg>`;

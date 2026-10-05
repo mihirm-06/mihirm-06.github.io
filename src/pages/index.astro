@@ -9,6 +9,15 @@ import { site } from '../data/site';
 ---
 
 <Base>
+  <!-- Starts the fade when the page is actually shown. Chrome can pre-render a page while you
+       are still typing the address, which would play the fade where nobody sees it. Without
+       JavaScript the page just shows with no fade. -->
+  <script is:inline>
+    const startFade = () => document.documentElement.classList.add('fade');
+    if (document.prerendering) document.addEventListener('prerenderingchange', startFade, { once: true });
+    else startFade();
+  </script>
+
   <section class="hero">
     <h1>{site.name}</h1>
     <p class="intro">{site.intro}</p>
@@ -39,11 +48,6 @@ import { site } from '../data/site';
 </Base>
 
 <style>
-  /* the hero and tiles fade in on load, which hides fonts and images settling into place */
-  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  .hero, .tiles { animation: fade-in 350ms ease both; }
-  @media (prefers-reduced-motion: reduce) { .hero, .tiles { animation: none; } }
-
   .hero h1 { margin: 0; font-weight: 800; letter-spacing: 0.01em; line-height: 0.95; font-size: clamp(2.2rem, 5.2vw, 3.7rem); text-wrap: balance; }
   .intro { margin: 0.9rem 0 0; color: var(--muted); font-size: 1rem; }
   .hero :global(.tagline) { margin-top: 0.1rem; }
@@ -55,5 +59,38 @@ import { site } from '../data/site';
   .tiles { max-width: 52rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   @media (max-width: 760px) {
     .tiles { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- On load the elements fade in one after another, from the top down. These are global
+     rules because some of the elements come from other components. They only apply once the
+     script at the top has added the "fade" class to the page. -->
+<style is:global>
+  @keyframes ripple-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  html.fade .hero > h1,
+  html.fade .hero > .intro,
+  html.fade .hero .tagline,
+  html.fade .hero .icons,
+  html.fade .hero .info .date,
+  html.fade .hero .info .weather[data-ready],
+  html.fade .tiles > .tile {
+    animation: ripple-in 600ms ease both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  /* the order they appear in: --i is each element's place in the line */
+  html.fade .hero > .intro { --i: 1; }
+  html.fade .hero .tagline { --i: 2; }
+  html.fade .hero .icons { --i: 3; }
+  html.fade .hero .info .date { --i: 4; }
+  html.fade .hero .info .weather { --i: 5; }
+  html.fade .tiles > .tile:nth-child(1) { --i: 6; }
+  html.fade .tiles > .tile:nth-child(2) { --i: 7; }
+  html.fade .tiles > .tile:nth-child(3) { --i: 8; }
+  html.fade .tiles > .tile:nth-child(4) { --i: 9; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.fade .hero > h1, html.fade .hero > .intro, html.fade .hero .tagline, html.fade .hero .icons,
+    html.fade .hero .info .date, html.fade .hero .info .weather[data-ready], html.fade .tiles > .tile { animation: none; }
   }
 </style>

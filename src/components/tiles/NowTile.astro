@@ -21,7 +21,7 @@ if (!photo) throw new Error(`Missing cover: src/assets/now/${cover}`);
 
 <Tile label={label} href={href}>
   <Fragment slot="thumb">
-    <Image src={photo} alt="" widths={[128, 256]} sizes="128px" />
+    <Image src={photo} alt="" widths={[128, 256]} sizes="128px" loading="eager" />
   </Fragment>
   <p class="t-line"><span class="t-title">{title}</span></p>
 </Tile>

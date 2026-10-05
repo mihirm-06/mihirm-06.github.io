@@ -1,14 +1,11 @@
 ---
 import { place } from '../data/now';
-import { fetchWeather, describe, icons, type Weather } from '../lib/weather';
+import { buildTimeWeather, describe, icons } from '../lib/weather';
 
 // Fetched while the site builds, so the first paint already has the weather. The deploy
 // workflow rebuilds the site every 30 minutes. If the fetch fails the line starts empty
 // and the browser fetches it once.
-let baked: Weather | null = null;
-try {
-  baked = await fetchWeather(AbortSignal.timeout(5000));
-} catch {}
+const baked = await buildTimeWeather();
 const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(baked.temp)}°F` };
 ---
 

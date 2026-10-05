@@ -10,7 +10,7 @@ const project = projects.find((p) => p.data.status === 'in progress') ?? project
 
 {project && (
   <Tile label="Building" href={`/projects/${project.id}`}>
-    <div slot="thumb" class="cover-box">{project.data.cover && <Cover name={project.data.cover} />}</div>
+    <div slot="thumb" class="cover-box">{project.data.cover && <Cover name={project.data.cover} eager />}</div>
     <p class="t-line"><span class="t-title">{project.data.title}</span></p>
   </Tile>
 )}
