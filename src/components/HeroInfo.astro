@@ -3,11 +3,11 @@ import { place } from '../data/now';
 import { fetchWeather, describe, icons, type Weather } from '../lib/weather';
 
 // Fetched while the site builds, so the first paint already has the weather. The deploy
-// workflow rebuilds the site every 30 minutes, and the browser refreshes it after that.
-// If the fetch fails the line starts empty and the browser fills it in.
-let baked: (Weather & { at: number }) | null = null;
+// workflow rebuilds the site every 30 minutes. If the fetch fails the line starts empty
+// and the browser fetches it once.
+let baked: Weather | null = null;
 try {
-  baked = { ...(await fetchWeather(AbortSignal.timeout(5000))), at: Date.now() };
+  baked = await fetchWeather(AbortSignal.timeout(5000));
 } catch {}
 const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(baked.temp)}°F` };
 ---
@@ -17,7 +17,7 @@ const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(b
     <span class="ico" data-daynight aria-hidden="true"></span>
     <span data-time>&nbsp;</span>
   </p>
-  <p class="line weather" data-weather data-baked={baked && JSON.stringify(baked)} data-ready={now?.text ? '' : undefined}>
+  <p class="line weather" data-weather data-baked={baked ? '' : undefined} data-ready={now?.text ? '' : undefined}>
     <span class="ico" data-wicon aria-hidden="true" set:html={now?.icon}></span>
     <span>It's <strong><span data-temp>{now?.temp}</span> and <span data-cond>{now?.text}</span></strong> in {place.name}.</span>
   </p>
@@ -46,39 +46,25 @@ const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(b
 </script>
 
 <script>
-  import { fetchWeather, describe, type Weather } from '../lib/weather';
+  // The weather is baked into the page when the site builds (and the deploy workflow rebuilds
+  // it every 30 minutes), so the page shows that and never swaps it. This only runs if the
+  // build could not get any weather: it fetches once so the line is not left empty.
+  import { fetchWeather, describe } from '../lib/weather';
 
-  const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s);
-  // ---------- weather ----------
-  const weatherEl = $('[data-weather]')!;
-  const show = ({ temp, code, day }: Weather) => {
-    const { text, icon } = describe(code, day);
-    if (!text) return;
-    $('[data-temp]')!.textContent = `${Math.round(temp)}°F`;
-    $('[data-cond]')!.textContent = text;
-    $('[data-wicon]')!.innerHTML = icon;
-    weatherEl.dataset.ready = '';
-  };
-
-  // Use the newest answer we have: the one baked into the page at build time or the one
-  // saved in this browser. Show it straight away, even if it is old, and refresh it once
-  // it is more than 10 minutes old. Storage can be blocked, so every access is guarded.
-  const KEY = 'weather-v4';
-  type Saved = { data: Weather; at: number };
-  const readSaved = (): Saved | null => {
-    try { return JSON.parse(localStorage.getItem(KEY) ?? 'null'); } catch { return null; }
-  };
-  const save = (data: Weather) => { try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data })); } catch {} };
-  const baked = JSON.parse(weatherEl.dataset.baked || 'null') as (Weather & { at: number }) | null;
-
-  const candidates: Saved[] = [readSaved(), baked && { data: baked, at: baked.at }].filter((c): c is Saved => !!c);
-  const newest = candidates.sort((a, b) => b.at - a.at)[0];
-  if (newest) show(newest.data);
-
-  if (!newest || Date.now() - newest.at > 10 * 60_000) {
-    fetchWeather().then((data) => { show(data); save(data); }).catch(() => {
-      // keep whatever is on screen (or nothing): the date and time still show
-    });
+  const weatherEl = document.querySelector<HTMLElement>('[data-weather]')!;
+  if (!weatherEl.hasAttribute('data-baked')) {
+    fetchWeather()
+      .then(({ temp, code, day }) => {
+        const { text, icon } = describe(code, day);
+        if (!text) return;
+        weatherEl.querySelector('[data-temp]')!.textContent = `${Math.round(temp)}°F`;
+        weatherEl.querySelector('[data-cond]')!.textContent = text;
+        weatherEl.querySelector('[data-wicon]')!.innerHTML = icon;
+        weatherEl.dataset.ready = '';
+      })
+      .catch(() => {
+        // leave the weather line empty: the date and time still show
+      });
   }
 </script>
 
