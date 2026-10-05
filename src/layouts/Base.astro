@@ -31,6 +31,14 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <!-- Adds the "fade" class once the page is actually shown. The Home page's intro animation
+         waits for it: Chrome can pre-render a page while you are still typing the address,
+         which would play the animation where nobody sees it. -->
+    <script is:inline>
+      const startFade = () => document.documentElement.classList.add('fade');
+      if (document.prerendering) document.addEventListener('prerenderingchange', startFade, { once: true });
+      else startFade();
+    </script>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

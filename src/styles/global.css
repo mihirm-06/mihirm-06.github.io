@@ -139,3 +139,13 @@ main.wrap { flex: 1; display: grid; align-content: start; gap: 4.5rem; padding-b
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------- page transitions ---------- */
+/* Moving between pages crossfades the old page into the new one, with no blank moment in between.
+   The nav and footer have their own names, so they stay put and only the content fades. Browsers
+   without support just load the page as usual. */
+@view-transition { navigation: auto; }
+.nav { view-transition-name: site-nav; }
+.foot { view-transition-name: site-foot; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 180ms; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }

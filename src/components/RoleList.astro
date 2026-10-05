@@ -1,7 +1,8 @@
 ---
 // The split layout used by the Education, Experience, and Research sections on Home:
 // role, organization, dates (and paper status) on the left with bullets on the right;
-// below them, links on the left and tags on the right, on the same line.
+// links sit under the left column, and tags sit under the bullets. Each column stacks on its
+// own, so an entry with no links leaves no gap.
 import type { Role } from '../data/experience';
 import Tags from './Tags.astro';
 
@@ -15,21 +16,25 @@ const { roles } = Astro.props;
     if (job.paper?.href) links.push({ label: 'Paper', href: job.paper.href });
     return (
       <article class="split-item">
-        <div class="split-head">
-          <h3 class="role">{job.role}</h3>
-          <p class="org">{job.org}</p>
-          <p class="date">{job.dates}</p>
-          {job.paper && <p class="paper-status">{job.paper.status}</p>}
+        <div class="split-side">
+          <div class="split-head">
+            <h3 class="role">{job.role}</h3>
+            <p class="org">{job.org}</p>
+            <p class="date">{job.dates}</p>
+            {job.paper && <p class="paper-status">{job.paper.status}</p>}
+          </div>
+          {links.length > 0 && (
+            <p class="role-links">
+              {links.map((link) => (
+                <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
+              ))}
+            </p>
+          )}
         </div>
-        <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
-        {links.length > 0 && (
-          <p class="role-links">
-            {links.map((link) => (
-              <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
-            ))}
-          </p>
-        )}
-        {job.tags.length > 0 && <div class="role-tags"><Tags tags={job.tags} /></div>}
+        <div class="split-main">
+          <ul class="bullets">{job.bullets.map((b) => <li>{b}</li>)}</ul>
+          {job.tags.length > 0 && <div class="role-tags"><Tags tags={job.tags} /></div>}
+        </div>
       </article>
     );
   })}
@@ -41,27 +46,25 @@ const { roles } = Astro.props;
   .split-item {
     display: grid;
     grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
-    grid-template-areas:
-      "head bullets"
-      "links tags";
     column-gap: 3rem;
     padding: 1.2rem 0;
   }
   .split-item:first-child { padding-top: 0.6rem; }
-  .split-head { grid-area: head; }
-  .bullets { grid-area: bullets; }
-  .role-links { grid-area: links; margin: 0.7rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-self: baseline; }
-  .role-tags { grid-area: tags; margin-top: 0.7rem; align-self: baseline; }
+  .split-side, .split-main { min-width: 0; }
+  .role-links { margin: 0.7rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+  .role-tags { margin-top: 0.7rem; }
   .role { margin: 0; font-size: 1.08rem; font-weight: 700; text-wrap: balance; }
   .org { margin: 0.25rem 0 0; opacity: 0.85; font-size: 0.95rem; }
   .split-head .date { margin-top: 0.6rem; }
   .paper-status { margin: 0.35rem 0 0; font: 400 0.7rem/1.4 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
 
-  /* phones: a simple column. Only the parts an entry has take up space, so empty rows
-     (no tags, no links) don't add extra gap and every entry ends with the same spacing. */
+  /* phones: a simple column in the order head, bullets, tags, links. The two column wrappers
+     disappear, so only the parts an entry has take up space, and entries without tags or
+     links add no extra gap. */
   @media (max-width: 760px) {
     .split-item { display: flex; flex-direction: column; gap: 0.8rem; }
+    .split-side, .split-main { display: contents; }
     .role-tags { order: 1; }
     .role-links { order: 2; }
     .role-links, .role-tags { margin-top: 0; }
