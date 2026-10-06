@@ -26,7 +26,7 @@ const { roles } = Astro.props;
           {links.length > 0 && (
             <p class="role-links">
               {links.map((link) => (
-                <a class="sec-link" href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>
+                <a class="sec-link" href={link.href} target="_blank" rel="noreferrer" data-astro-prefetch="false">{link.label} ↗</a>
               ))}
             </p>
           )}

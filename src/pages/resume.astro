@@ -18,7 +18,7 @@ const toc = [
 <Base title="Résumé" description="Education, experience, and research of Mihir Mankikar.">
   <div class="resume">
     <section class="sec">
-      <div class="sec-head"><h1>Résumé</h1><a class="sec-link" href={site.resume} download>Download PDF ↓</a></div>
+      <div class="sec-head"><h1>Résumé</h1><a class="sec-link" href={site.resume} data-astro-prefetch="false" download>Download PDF ↓</a></div>
       <nav class="jump" aria-label="On this page">
         <span class="kicker">Scroll to:</span>
         {toc.map(({ slug, text }) => <a href={`#${slug}`}>{text}</a>)}

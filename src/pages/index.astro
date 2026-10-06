@@ -23,7 +23,7 @@ import { site } from '../data/site';
       <a href={`mailto:${site.links.email}`} aria-label="Email">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.75h18v10.5H3z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.2 7.6 12 13.4l7.8-5.8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
-      <a href={site.resume} target="_blank" aria-label="Résumé">
+      <a href={site.resume} data-astro-prefetch="false" target="_blank" aria-label="Résumé">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.8h8.7L19 8v12.2H6z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14.7 3.8V8H19" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.8 11h7.4M8.8 14h7.4M8.8 17h5.1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
     </div>

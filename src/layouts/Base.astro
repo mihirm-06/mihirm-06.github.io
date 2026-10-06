@@ -67,7 +67,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
           <a href={site.links.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
           <a href={site.links.github} target="_blank" rel="noreferrer">GitHub</a>
           <a href={`mailto:${site.links.email}`}>Email</a>
-          <a href={site.resume} download>Résumé</a>
+          <a href={site.resume} data-astro-prefetch="false" download>Résumé</a>
         </span>
       </div>
     </footer>
