@@ -43,15 +43,31 @@ export const icons = {
   storm: svg('<path d="M6 16.3A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 .5 9"/><path d="m13 12-3 5h4l-3 5"/>'),
 };
 
+export type IconName = keyof typeof icons;
+
 // the word for the sentence ("It's 74°F and overcast...") and the icon, from a WMO weather code
-export function describe(code: number, day: boolean): { text: string; icon: string } {
-  if (code === 0 || code === 1) return { text: 'clear', icon: day ? icons.sun : icons.moon };
-  if (code === 2) return { text: 'partly cloudy', icon: icons.cloud };
-  if (code === 3) return { text: 'overcast', icon: icons.cloud };
-  if (code === 45 || code === 48) return { text: 'foggy', icon: icons.fog };
-  if (code >= 51 && code <= 57) return { text: 'drizzling', icon: icons.rain };
-  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return { text: 'raining', icon: icons.rain };
-  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return { text: 'snowing', icon: icons.snow };
-  if (code >= 95) return { text: 'stormy', icon: icons.storm };
-  return { text: '', icon: icons.cloud };
+export function describeKind(code: number, day: boolean): { text: string; icon: IconName } {
+  if (code === 0 || code === 1) return { text: 'clear', icon: day ? 'sun' : 'moon' };
+  if (code === 2) return { text: 'partly cloudy', icon: 'cloud' };
+  if (code === 3) return { text: 'overcast', icon: 'cloud' };
+  if (code === 45 || code === 48) return { text: 'foggy', icon: 'fog' };
+  if (code >= 51 && code <= 57) return { text: 'drizzling', icon: 'rain' };
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return { text: 'raining', icon: 'rain' };
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return { text: 'snowing', icon: 'snow' };
+  if (code >= 95) return { text: 'stormy', icon: 'storm' };
+  return { text: '', icon: 'cloud' };
 }
+
+export function describe(code: number, day: boolean): { text: string; icon: string } {
+  const { text, icon } = describeKind(code, day);
+  return { text, icon: icons[icon] };
+}
+
+// Every weather code Open-Meteo can return, as [word, daytime icon, night icon]. The page's
+// inline script uses this to show a saved weather reading before the page first paints.
+export const kindTable: Record<number, [string, IconName, IconName]> = Object.fromEntries(
+  [0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99].map((code) => [
+    code,
+    [describeKind(code, true).text, describeKind(code, true).icon, describeKind(code, false).icon],
+  ]),
+);

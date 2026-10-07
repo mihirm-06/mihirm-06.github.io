@@ -1,11 +1,17 @@
 ---
 import { place } from '../data/now';
-import { buildTimeWeather, describe, icons } from '../lib/weather';
+import { buildTimeWeather, describe, icons, kindTable } from '../lib/weather';
 
-// Fetched while the site builds, so the first paint already has the weather. The deploy
-// workflow rebuilds the site every 30 minutes. If the fetch fails the line starts empty
-// and the browser fetches it once.
+// How old the weather on screen can get before the browser fetches a fresh reading, and the
+// storage key for the reading it fetched. The deploy workflow rebuilds the site every 30
+// minutes, so this only comes into play when builds stop running for a while.
+const STALE_MINUTES = 60;
+const STORAGE_KEY = 'weather-v5';
+
+// Fetched while the site builds, so the first paint already has the weather. If the fetch
+// fails the line starts empty and the browser fetches it once.
 const baked = await buildTimeWeather();
+const builtAt = Date.now();
 const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(baked.temp)}°F` };
 ---
 
@@ -14,11 +20,43 @@ const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(b
     <span class="ico" data-daynight aria-hidden="true"></span>
     <span data-time>&nbsp;</span>
   </p>
-  <p class="line weather" data-weather data-baked={baked ? '' : undefined} data-ready={now?.text ? '' : undefined}>
-    <span class="ico" data-wicon aria-hidden="true" set:html={now?.icon}></span>
-    <span>It's <strong><span data-temp>{now?.temp}</span> and <span data-cond>{now?.text}</span></strong> in {place.name}.</span>
+  <p
+    class="line weather"
+    data-weather
+    data-w={baked ? JSON.stringify(baked) : undefined}
+    data-at={builtAt}
+    data-key={STORAGE_KEY}
+    data-stale={STALE_MINUTES * 60_000}
+    data-ready={now?.text ? '' : undefined}
+  >
+    <span class="turn">
+      <span class="ico slot" data-wicon aria-hidden="true"><span class="layer" set:html={now?.icon}></span></span>
+      <span>It's <strong><span class="slot" data-temp><span class="layer">{now?.temp}</span></span> and <span class="slot" data-cond><span class="layer">{now?.text}</span></span></strong> in {place.name}.</span>
+    </span>
   </p>
 </div>
+
+<!-- Runs as soon as the line above is parsed, before the first paint. If this browser saved a
+     newer weather reading than the one built into the page (and it is not stale), it is shown
+     right away, so a refresh never flashes the old number. -->
+<script is:inline define:vars={{ kindTable, icons, STORAGE_KEY, STALE_MS: STALE_MINUTES * 60_000 }}>
+  const weatherLine = document.querySelector('[data-weather]');
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+    const builtAt = Number(weatherLine.dataset.at);
+    if (saved && saved.at > builtAt && Date.now() - saved.at < STALE_MS && kindTable[saved.data.code]) {
+      const [word, dayIcon, nightIcon] = kindTable[saved.data.code];
+      weatherLine.querySelector('[data-temp] .layer').textContent = Math.round(saved.data.temp) + '°F';
+      weatherLine.querySelector('[data-cond] .layer').textContent = word;
+      weatherLine.querySelector('[data-wicon] .layer').innerHTML = icons[saved.data.day ? dayIcon : nightIcon];
+      weatherLine.dataset.w = JSON.stringify(saved.data);
+      weatherLine.dataset.at = String(saved.at);
+      weatherLine.dataset.ready = '';
+    }
+  } catch {
+    // storage is blocked or unreadable: the page just keeps the built-in reading
+  }
+</script>
 
 <!-- Runs as soon as the line above is parsed, so the date is there on first paint. A module
      script would wait for the whole page and its imports to load first. -->
@@ -43,38 +81,100 @@ const now = baked && { ...describe(baked.code, baked.day), temp: `${Math.round(b
 </script>
 
 <script>
-  // The weather is baked into the page when the site builds (and the deploy workflow rebuilds
-  // it every 30 minutes), so the page shows that and never swaps it. This only runs if the
-  // build could not get any weather: it fetches once so the line is not left empty.
-  import { fetchWeather, describe } from '../lib/weather';
+  // Keeps the weather from going stale. The reading on screen is the newest of the one built
+  // into the page and one this browser saved. If that is more than an hour old (the build has
+  // not run for a while), fetch the current weather and turn the changed part of the line to it,
+  // like a dial. On normal days nothing here happens.
+  import { fetchWeather, describeKind, describe, icons, type Weather } from '../lib/weather';
 
-  const weatherEl = document.querySelector<HTMLElement>('[data-weather]')!;
-  if (!weatherEl.hasAttribute('data-baked')) {
-    fetchWeather()
-      .then(({ temp, code, day }) => {
-        const { text, icon } = describe(code, day);
-        if (!text) return;
-        weatherEl.querySelector('[data-temp]')!.textContent = `${Math.round(temp)}°F`;
-        weatherEl.querySelector('[data-cond]')!.textContent = text;
-        weatherEl.querySelector('[data-wicon]')!.innerHTML = icon;
-        weatherEl.dataset.ready = '';
-      })
-      .catch(() => {
-        // leave the weather line empty: the date and time still show
-      });
-  }
+  const line = document.querySelector<HTMLElement>('[data-weather]')!;
+  // the same values the inline script above uses; the frontmatter sets them
+  const STALE_MS = Number(line.dataset.stale);
+  const STORAGE_KEY = line.dataset.key!;
+  const layer = (selector: string) => line.querySelector<HTMLElement>(`${selector} .layer`)!;
+  const tempLayer = layer('[data-temp]');
+  const condLayer = layer('[data-cond]');
+  const iconLayer = layer('[data-wicon]');
+  const turn = line.querySelector<HTMLElement>('.turn')!;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const read = (): Weather | null => {
+    try { return JSON.parse(line.dataset.w ?? 'null'); } catch { return null; }
+  };
+  const render = (w: Weather) => {
+    const { text, icon } = describe(w.code, w.day);
+    tempLayer.textContent = `${Math.round(w.temp)}°F`;
+    condLayer.textContent = text;
+    iconLayer.innerHTML = icon;
+    line.dataset.w = JSON.stringify(w);
+    line.dataset.ready = '';
+  };
+
+  // a drum: the old text rolls down and tips away, the new text comes in from the top
+  const out: Keyframe[] = [{ transform: 'rotateX(0)', opacity: 1 }, { transform: 'rotateX(-80deg)', opacity: 0 }];
+  const into: Keyframe[] = [{ transform: 'rotateX(80deg)', opacity: 0 }, { transform: 'rotateX(0)', opacity: 1 }];
+  const MS = 260;
+
+  // Only what changed turns: the temperature alone, the conditions (word and icon) together,
+  // or the whole line when both changed.
+  const update = async (next: Weather) => {
+    const before = read();
+    const tempChanged = !before || Math.round(before.temp) !== Math.round(next.temp);
+    const a = before && describeKind(before.code, before.day);
+    const b = describeKind(next.code, next.day);
+    const condChanged = !a || a.text !== b.text || a.icon !== b.icon;
+    if (!before || reduceMotion || (!tempChanged && !condChanged)) return render(next);
+
+    const parts = tempChanged && condChanged ? [turn] : tempChanged ? [tempLayer] : [condLayer, iconLayer];
+    for (const p of parts) p.style.transformOrigin = '50% 50% -1em';
+    const leaving = parts.map((p) => p.animate(out, { duration: MS, easing: 'ease-in', fill: 'forwards' }));
+    await Promise.all(leaving.map((x) => x.finished));
+    render(next);
+    const arriving = parts.map((p) => p.animate(into, { duration: MS + 40, easing: 'ease-out' }));
+    leaving.forEach((x) => x.cancel());
+    await Promise.all(arriving.map((x) => x.finished));
+  };
+
+  let checking = false;
+  const check = async () => {
+    if (checking) return;
+    const age = Date.now() - Number(line.dataset.at);
+    const hasReading = !!read();
+    // no reading at all (the build could not get one): fetch it. Otherwise only when it is stale.
+    if (hasReading && age < STALE_MS) return;
+    checking = true;
+    try {
+      const fresh = await fetchWeather();
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ at: Date.now(), data: fresh })); } catch {}
+      line.dataset.at = String(Date.now());
+      await update(fresh);
+    } catch {
+      // leave what is on screen: the date and time still show
+    }
+    checking = false;
+  };
+
+  check();
+  // someone coming back to a tab that has been open for hours
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
 </script>
 
 <style>
-  .info { margin-top: 1.5rem; display: grid; gap: 0.55rem; }
+  .info { margin-top: 1.5rem; display: grid; gap: 0.55rem; perspective: 500px; perspective-origin: 0 50%; }
   .line { margin: 0; display: flex; align-items: center; gap: 0.7rem; min-height: 1.5em; }
-  /* the weather line keeps its space and fades in when the data arrives */
+  /* the weather line keeps its space and fades in when there is data */
   .weather { color: var(--muted); opacity: 0; transition: opacity 400ms ease; }
   .weather[data-ready] { opacity: 1; }
   /* the temperature and conditions stand out from the muted rest of the line */
   .weather strong { font-weight: 700; color: var(--text); }
   .date { color: var(--sec); }
   @media (prefers-reduced-motion: reduce) { .weather { transition: none; } }
+  /* the parts that turn when the weather changes: the whole line, the icon, the temperature,
+     and the conditions. Each is a fixed box (.slot) with a turning layer (.layer) inside it. */
+  .turn { display: inline-flex; align-items: center; gap: 0.7rem; }
+  .layer { display: inline-block; }
+  [data-temp].slot, [data-cond].slot { display: inline-block; vertical-align: bottom; }
   .ico { color: var(--accent-2); flex: none; width: 1.25rem; height: 1.25rem; display: inline-flex; }
+  .ico .layer { display: flex; width: 100%; height: 100%; }
   .ico :global(svg) { width: 100%; height: 100%; }
 </style>
